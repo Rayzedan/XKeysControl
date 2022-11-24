@@ -1,7 +1,7 @@
 #include "OpcUaClient.h"
 #include "ParseXml.h"
 #include "SetupDevice.h"
-#include <iostream>
+//#include <iostream>
 
 UA_Boolean running;
 SetupDevice* device = new SetupDevice();

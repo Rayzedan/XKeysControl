@@ -29,6 +29,7 @@ ParseXml::ParseXml()
         }
         signals[key].first = signalPath;
         signals[key].second = enableOpc;
+        //std::cout << name
     }
 }
 ParseXml::~ParseXml() 
