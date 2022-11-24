@@ -24,9 +24,6 @@ private:
 	static void subscriptionInactivityCallback(UA_Client* client, UA_UInt32 subId, void* subContext);
 	static void stateCallback(UA_Client* client, UA_SecureChannelState channelState,
 		UA_SessionState sessionState, UA_StatusCode recoveryStatus);
-	static void readValueAttributeCallback(UA_Client* client, void* userdata,
-		UA_UInt32 requestId, UA_StatusCode status, 
-		UA_DataValue* var);
 
 };
 #endif

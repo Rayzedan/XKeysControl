@@ -7,10 +7,10 @@
   <UpdateClientTime value="5" />
   <SetupDeviceTime value="30" />
   <Buttons>
-	<Button  Number="1" EnableOPC="1" SignalPath="Object.error" />
-	<Button  Number="4" EnableOPC="0" SignalPath="Object.low" />
-	<Button  Number="5" EnableOPC="1" SignalPath="Object.CRITICAL" />
-	<Button  Number="6" EnableOPC="1" SignalPath="Object.WARNING" />
-	<Button  Number="7" EnableOPC="1" SignalPath="Object.ERROR_1" />
+	<Button  Number="0" EnableOPC="1" SignalPath="Object.error" />
+	<Button  Number="1" EnableOPC="0" SignalPath="Object.low" />
+	<Button  Number="3" EnableOPC="1" SignalPath="Object.CRITICAL" />
+	<Button  Number="4" EnableOPC="1" SignalPath="Object.WARNING" />
+	<Button  Number="5" EnableOPC="1" SignalPath="Object.ERROR_1" />
   </Buttons>
 </configuration>

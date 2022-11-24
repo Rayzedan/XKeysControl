@@ -11,5 +11,4 @@ int __cdecl _tmain()
 
 	worker->subLoop("opc.tcp://localhost:62544");
 	//delete worker;
-	return 0;
 }

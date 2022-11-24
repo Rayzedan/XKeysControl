@@ -16,15 +16,15 @@ ParseXml::ParseXml()
             std::string name = attr.name();
             if (name == "EnableOPC") {
                 enableOpc = atoi(attr.value());
-                std::cout << "enableOpc - " << enableOpc << std::endl;
+                //std::cout << "enableOpc - " << enableOpc << std::endl;
             }
             else if (name == "SignalPath") {
                signalPath = attr.value();
-               std::cout << "signalPath - " << signalPath << std::endl;
+               //std::cout << "signalPath - " << signalPath << std::endl;
             }
             else if (name == "Number") {
                 key = atoi(attr.value());
-                std::cout << "KEY - " << key << std::endl;             
+                //std::cout << "KEY - " << key << std::endl;             
             }
         }
         signals[key].first = signalPath;
@@ -33,7 +33,7 @@ ParseXml::ParseXml()
 }
 ParseXml::~ParseXml() 
 {
-    std::cout << "DELETE PARSE XML\n";
+    //std::cout << "DELETE PARSE XML\n";
 }
 
 void ParseXml::getSignalMap(std::map<int, std::pair<std::string, int>>& temp)

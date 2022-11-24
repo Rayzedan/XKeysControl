@@ -2,6 +2,7 @@
 #include "ParseXml.h"
 #include "SetupDevice.h"
 #include <iostream>
+
 UA_Boolean running;
 SetupDevice* device = new SetupDevice();
 ParseXml* file = new ParseXml();
@@ -15,7 +16,7 @@ OpcUaClient::OpcUaClient()
 
 OpcUaClient::~OpcUaClient() 
 {
-    std::cout << "DELETE OPC UA CLIENT\n";
+    //std::cout << "DELETE OPC UA CLIENT\n";
     stopSession();
     delete device;
     delete file;
@@ -23,23 +24,22 @@ OpcUaClient::~OpcUaClient()
 
 void OpcUaClient::handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* subContext, UA_UInt32 monId, void* monContext, UA_DataValue* value) 
 {
-    UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "current node changed");
     //UA_sleep_ms(1000);   
     if (UA_Variant_hasScalarType(&value->value, &UA_TYPES[UA_TYPES_BOOLEAN])) {
         UA_Boolean error = *(UA_Boolean*)value->value.data;
         int temp = subId;
         //std::cout << "MON ID - " << temp << std::endl;
-        std::cout << "SUB ID - " << temp << std::endl;
+        //std::cout << "SUB ID - " << temp << std::endl;
         int index = subcribeMap[temp];
-        for (const auto& item : subcribeMap) {
-            std::cout << "KEY - " << item.first << " VALUE - " << item.second << std::endl;
-        }
+        //for (const auto& item : subcribeMap) {
+        //    std::cout << "KEY - " << item.first << " VALUE - " << item.second << std::endl;
+        //}
         if (error) {
-            std::cout << "index - " << index << std::endl;
+            //std::cout << "index - " << index << std::endl;
             device->setLED(index, 2);
         }
         else {
-            std::cout << "index - " << index << std::endl;
+            //std::cout << "index - " << index << std::endl;
             device->setLED(index, 1);
         }   
        /* printf("---%-40s%-8i\n",
@@ -49,13 +49,13 @@ void OpcUaClient::handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* s
 
 void OpcUaClient::deleteSubscriptionCallback(UA_Client* client, UA_UInt32 subscriptionId, void* subscriptionContext) 
 {
-    UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-        "Subscription Id %u was deleted", subscriptionId);
+    /*UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+        "Subscription Id %u was deleted", subscriptionId);*/
 }
 
 void OpcUaClient::subscriptionInactivityCallback(UA_Client* client, UA_UInt32 subId, void* subContext) 
 {
-    UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Inactivity for subscription %u", subId);
+    //UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Inactivity for subscription %u", subId);
 }
 
 void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channelState,
@@ -64,16 +64,16 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
     switch (channelState) {
     case UA_SECURECHANNELSTATE_FRESH:
     case UA_SECURECHANNELSTATE_CLOSED:
-        UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "The client is disconnected");
+        //UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "The client is disconnected");
         break;
     case UA_SECURECHANNELSTATE_HEL_SENT:
-        UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Waiting for ack");
+        //UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Waiting for ack");
         break;
     case UA_SECURECHANNELSTATE_OPN_SENT:
-        UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Waiting for OPN Response");
+        //UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Waiting for OPN Response");
         break;
     case UA_SECURECHANNELSTATE_OPEN:
-        UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "A SecureChannel to the server is open");
+        //UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "A SecureChannel to the server is open");
         break;
     default:
         break;
@@ -81,20 +81,20 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
 
     switch (sessionState) {
     case UA_SESSIONSTATE_ACTIVATED: {
-        UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "A session with the server is activated");
+        //UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "A session with the server is activated");
         /* A new session was created. We need to create the subscription. */
         /* Create a subscription */
         for (const auto& item : signalMap) {
-            std::cout <<  "item second - " << item.second.second << std::endl;
+            //std::cout <<  "item second - " << item.second.second << std::endl;
             /* Add a MonitoredItem */
             if (item.second.second) {
                 UA_CreateSubscriptionRequest request = UA_CreateSubscriptionRequest_default();
                 UA_CreateSubscriptionResponse response =
                     UA_Client_Subscriptions_create(client, request, NULL, NULL, deleteSubscriptionCallback);
                 if (response.responseHeader.serviceResult == UA_STATUSCODE_GOOD) {
-                    UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-                        "Create subscription succeeded, id %u",
-                        response.subscriptionId);
+                    //UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                    //    "Create subscription succeeded, id %u",
+                    //    response.subscriptionId);
                 }
                 else
                     return;
@@ -108,39 +108,23 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
                         UA_TIMESTAMPSTORETURN_BOTH, monRequest,
                         NULL, handlerNodeChanged, NULL);
                 if (monResponse.statusCode == UA_STATUSCODE_GOOD) {
-                    UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-                        "Monitoring, id %u",
-                        monResponse.monitoredItemId);
+                    //UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                    //    "Monitoring, id %u",
+                    //    monResponse.monitoredItemId);
                     int key = response.subscriptionId;
                     int value = item.first;
                     subcribeMap[key] = value;
-                    std::cout << "KEY - " << key << " INDEX BUTTON - " << value << std::endl;
+                    //std::cout << "KEY - " << key << " INDEX BUTTON - " << value << std::endl;
                 }
             }                       
         }
     }
         break;
     case UA_SESSIONSTATE_CLOSED:
-        UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Session disconnected");
+        //UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Session disconnected");
         break;
     default:
         break;
-    }
-}
-
-void OpcUaClient::readValueAttributeCallback(UA_Client* client, void* userdata,
-    UA_UInt32 requestId, UA_StatusCode status,
-    UA_DataValue* var) 
-{
-    UA_sleep_ms(1000);
-    if (UA_Variant_hasScalarType(&var->value, &UA_TYPES[UA_TYPES_BOOLEAN])) {
-        UA_Boolean error = *(UA_Boolean*)var->value.data;
-        if (error)
-            device->setLED(0, 2);
-        else
-            device->setLED(0, 1);
-        printf("---%-40s%-8i\n",
-            "Reading the value of node (1, \"Object.error\"):", error);
     }
 }
 

@@ -50,8 +50,8 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>PGInstrument</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -76,12 +76,12 @@
     <LibraryPath>C:\Program Files %28x86%29\open62541\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Program Files %28x86%29\pugixml\include;C:\Program Files %28x86%29\open62541\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\pugixml\lib;C:\Program Files %28x86%29\open62541\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files %28x86%29\pugixml\include;C:\Program Files %28x86%29\open62541\include;C:\Users\d.bezlepkin\Documents\WindowsServiceProject\service-base;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\d.bezlepkin\Documents\WindowsServiceProject\service-base\x64\Debug;C:\Program Files %28x86%29\pugixml\lib;C:\Program Files %28x86%29\open62541\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Program Files %28x86%29\open62541\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\open62541\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files %28x86%29\pugixml\include;C:\Program Files %28x86%29\open62541\include;C:\Users\d.bezlepkin\Documents\WindowsServiceProject\service-base;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\d.bezlepkin\Documents\WindowsServiceProject\service-base\x64\Debug;C:\Program Files %28x86%29\pugixml\lib;C:\Program Files %28x86%29\open62541\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -123,7 +123,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>pugixml.lib;open62541.lib;odbc32.lib;odbccp32.lib;PIEHid64.LIB;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>service-base.lib;pugixml.lib;open62541.lib;PIEHid64.LIB;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -134,12 +134,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>service-base.lib;pugixml.lib;open62541.lib;PIEHid64.LIB;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

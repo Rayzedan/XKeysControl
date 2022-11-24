@@ -8,7 +8,6 @@ public:
 	virtual ~SetupDevice();
 	void setLED(int indexButton, int indexState);
 private:
-	DWORD result;
-	long hnd;
+
 };
 
