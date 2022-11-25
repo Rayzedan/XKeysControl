@@ -1,9 +1,17 @@
 #include "OpcUaClient.h"
+<<<<<<< HEAD
 #include "ParseXml.h"
 #include "SetupDevice.h"
 #include <iostream>
 #include <vector>
 
+=======
+#include <iostream>
+#include <vector>
+#include <map>
+#include "SetupDevice.h"
+#include "ParseXml.h"
+>>>>>>> da350ce (New branch)
 UA_Boolean running;
 std::map<int, std::pair<std::string, int>> signalMap;
 std::map<int, int> subcribeMap;
@@ -14,7 +22,11 @@ ParseXml* file = new ParseXml();
 
 
 OpcUaClient::OpcUaClient() 
+<<<<<<< HEAD
 {
+=======
+{   
+>>>>>>> da350ce (New branch)
     std::cout << "Create OpcUaClient\n";
     file->getSignalMap(signalMap);
     file->getConfigList(config);
@@ -31,7 +43,11 @@ OpcUaClient::~OpcUaClient()
 
 }
 
+<<<<<<< HEAD
 void OpcUaClient::handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* subContext, UA_UInt32 monId, void* monContext, UA_DataValue* value) 
+=======
+void OpcUaClient::handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* subContext, UA_UInt32 monId, void* monContext, UA_DataValue* value)
+>>>>>>> da350ce (New branch)
 {
     //UA_sleep_ms(1000);   
     if (UA_Variant_hasScalarType(&value->value, &UA_TYPES[UA_TYPES_BOOLEAN])) {
@@ -96,7 +112,10 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
         /* A new session was created. We need to create the subscription. */
         /* Create a subscription */
         for (const auto& item : signalMap) {
+<<<<<<< HEAD
             //std::cout <<  "item second - " << item.second.second << std::endl;
+=======
+>>>>>>> da350ce (New branch)
             /* Add a MonitoredItem */
             if (item.second.second) {
                 UA_CreateSubscriptionRequest request = UA_CreateSubscriptionRequest_default();

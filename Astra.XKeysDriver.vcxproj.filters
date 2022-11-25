@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="SetupDevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StartDriver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowsService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParseXml.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpcUaClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ParseXml.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpcUaClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="event_ids.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SetupDevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowsService.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PieHid64.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MSG00409.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="event_ids.mc">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{cba7cef7-1e49-46a5-b386-72abcd3c9311}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{b26ae8eb-87bd-4a82-9eb9-b682d7b3f9dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{ef16ca5f-8cf1-40fa-bc91-51992dd67237}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="event_ids.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
