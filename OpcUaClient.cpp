@@ -15,6 +15,7 @@ ParseXml* file = new ParseXml();
 
 OpcUaClient::OpcUaClient() 
 {
+    std::cout << "Create OpcUaClient\n";
     file->getSignalMap(signalMap);
     file->getConfigList(config);
     timeout = atoi(config[2].c_str());
@@ -27,10 +28,7 @@ OpcUaClient::OpcUaClient()
 OpcUaClient::~OpcUaClient() 
 {
     std::cout << "DELETE OPC UA CLIENT\n";
-    UA_Client_delete(client);
-    stopSession();
-    delete device;
-    delete file;
+
 }
 
 void OpcUaClient::handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* subContext, UA_UInt32 monId, void* monContext, UA_DataValue* value) 
@@ -182,4 +180,7 @@ void OpcUaClient::subLoop()
 void OpcUaClient::stopSession()
 {
     running = false;
+    UA_Client_delete(client);
+    delete device;
+    delete file;
 }

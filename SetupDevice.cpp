@@ -17,7 +17,7 @@ DWORD timeoutDevice = 30;
 
 SetupDevice::SetupDevice() 
 {	
-	
+	std::cout << "Create SetupDevice\n";
 }
 
 SetupDevice::~SetupDevice() 
@@ -38,8 +38,7 @@ void installDevice()
 	hnd = 0;
 	long count = 0;
 	int pid;
-	result = EnumeratePIE(0x5F3, info, count);
-	
+	result = EnumeratePIE(0x5F3, info, count);	
 	while (result!=0)
 	{
 		Sleep(timeoutDevice * 1000);
@@ -47,18 +46,6 @@ void installDevice()
 		std::cout << "Trying to find a device...\n";
 		result = EnumeratePIE(0x5F3, info, count);
 	}
-	//if (result != 0)
-	//{
-	//	if (result == 102) {
-	//		//std::cout << "No PI Engineering Devices Found\n";
-	//	}
-	//	else {
-	//		//std::cout << "Error finding PI Engineering Devices\n";
-	//	}
-	//}
-	//else if (count == 0) {
-	//	//std::cout << "No PI Engineering Devices Found\n";
-	//}
 	for (long i = 0; i < count; ++i) {
 		pid = info[i].PID; //get the device pid
 
