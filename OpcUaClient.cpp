@@ -1,22 +1,26 @@
 #include "OpcUaClient.h"
 #include "ParseXml.h"
 #include "SetupDevice.h"
-//#include <iostream>
+#include <iostream>
+#include <vector>
 
 UA_Boolean running;
 SetupDevice* device = new SetupDevice();
 ParseXml* file = new ParseXml();
 std::map<int, std::pair<std::string, int>> signalMap;
 std::map<int, int> subcribeMap;
+std::vector<std::string> config;
 
 OpcUaClient::OpcUaClient() 
 {
+    client = UA_Client_new();
     running = true;
 }
 
 OpcUaClient::~OpcUaClient() 
 {
-    //std::cout << "DELETE OPC UA CLIENT\n";
+    std::cout << "DELETE OPC UA CLIENT\n";
+    UA_Client_delete(client);
     stopSession();
     delete device;
     delete file;
@@ -64,16 +68,17 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
     switch (channelState) {
     case UA_SECURECHANNELSTATE_FRESH:
     case UA_SECURECHANNELSTATE_CLOSED:
-        //UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "The client is disconnected");
+        UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "The client is disconnected");
+        device->setAllRed();
         break;
     case UA_SECURECHANNELSTATE_HEL_SENT:
-        //UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Waiting for ack");
+        UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Waiting for ack");
         break;
     case UA_SECURECHANNELSTATE_OPN_SENT:
-        //UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Waiting for OPN Response");
+        UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Waiting for OPN Response");
         break;
     case UA_SECURECHANNELSTATE_OPEN:
-        //UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "A SecureChannel to the server is open");
+        UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "A SecureChannel to the server is open");
         break;
     default:
         break;
@@ -81,7 +86,8 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
 
     switch (sessionState) {
     case UA_SESSIONSTATE_ACTIVATED: {
-        //UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "A session with the server is activated");
+        UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "A session with the server is activated");
+        device->setAllBlue();
         /* A new session was created. We need to create the subscription. */
         /* Create a subscription */
         for (const auto& item : signalMap) {
@@ -121,19 +127,27 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
     }
         break;
     case UA_SESSIONSTATE_CLOSED:
-        //UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Session disconnected");
+        UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Session disconnected");
+        device->setAllRed();
         break;
     default:
         break;
     }
 }
 
-void OpcUaClient::subLoop(std::string address) 
+void OpcUaClient::subLoop() 
 {
     file->getSignalMap(signalMap);
+    file->getConfigList(config);
+    DWORD timeout = atoi(config[2].c_str());
+    device->setTimeoutDevice(timeout);
+    int requestClientTime = 5;
+    requestClientTime = atoi(config[1].c_str());
+    std::cout << "IP - " << config[0] << '\n';
+    std::cout << "TIMEOUT - " << timeout << '\n';
+    std::cout << "REQUEST CLIENT TIME - " << requestClientTime << '\n';
     UA_Boolean value = 0;
     UA_UInt32 reqId = 0;
-    UA_Client* client = UA_Client_new();
     UA_ClientConfig* cc = UA_Client_getConfig(client);
     UA_ClientConfig_setDefault(cc);
     /* Set stateCallback */
@@ -144,19 +158,18 @@ void OpcUaClient::subLoop(std::string address)
         /* if already connected, this will return GOOD and do nothing */
         /* if the connection is closed/errored, the connection will be reset and then reconnected */
         /* Alternatively you can also use UA_Client_getState to get the current state */
-        UA_StatusCode retval = UA_Client_connect(client, address.c_str());
+        UA_StatusCode retval = UA_Client_connect(client, config[0].c_str());
         if (retval != UA_STATUSCODE_GOOD) {
             UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
                 "Not connected. Retrying to connect in 5 second");           
             /* The connect may timeout after 1 second (see above) or it may fail immediately on network errors */
             /* E.g. name resolution errors or unreachable network. Thus there should be a small sleep here */
-            UA_sleep_ms(5000);
+            UA_sleep_ms(requestClientTime*1000);
             continue;
-        }
-       //UA_Client_readValueAttribute_async(client, UA_NODEID_STRING(1, _strdup("Object.error")), readValueAttributeCallback,NULL, &reqId);
+        }       
    
 
-        UA_Client_run_iterate(client, 5000);
+        UA_Client_run_iterate(client, requestClientTime * 1000);
     };
 
     /* Clean up */
@@ -166,6 +179,4 @@ void OpcUaClient::subLoop(std::string address)
 void OpcUaClient::stopSession()
 {
     running = false;
-    delete device;
-    delete file;
 }

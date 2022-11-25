@@ -13,31 +13,55 @@ ParseXml::ParseXml()
         std::string signalPath;      
         for (pugi::xml_attribute attr = tool.first_attribute(); attr; attr = attr.next_attribute())
         {           
-            std::string name = attr.name();
+            std::string name = attr.name();            
             if (name == "EnableOPC") {
                 enableOpc = atoi(attr.value());
-                //std::cout << "enableOpc - " << enableOpc << std::endl;
             }
             else if (name == "SignalPath") {
                signalPath = attr.value();
-               //std::cout << "signalPath - " << signalPath << std::endl;
             }
             else if (name == "Number") {
-                key = atoi(attr.value());
-                //std::cout << "KEY - " << key << std::endl;             
+                key = atoi(attr.value());           
             }
         }
         signals[key].first = signalPath;
         signals[key].second = enableOpc;
-        //std::cout << name
+    }
+    tools = doc.child("configuration").child("OpcServer");
+    for (pugi::xml_node tool = tools.first_child(); tool; tool = tool.next_sibling())
+    {
+        for (pugi::xml_attribute attr = tool.first_attribute(); attr; attr = attr.next_attribute())
+        {
+            std::string name = attr.name();
+            config.push_back(attr.value());
+            //std::cout << "ip - " << attr.value() << '\n';
+ 
+        }
+    }
+    tools = doc.child("configuration");
+    for (pugi::xml_node tool = tools.first_child(); tool; tool = tool.next_sibling())
+    {
+        int i = 0;
+        for (pugi::xml_attribute attr = tool.first_attribute(); attr; attr = attr.next_attribute())
+        {            
+            config.push_back(attr.value());
+        }
     }
 }
 ParseXml::~ParseXml() 
 {
-    //std::cout << "DELETE PARSE XML\n";
+    std::cout << "DELETE PARSE XML\n";
 }
 
 void ParseXml::getSignalMap(std::map<int, std::pair<std::string, int>>& temp)
 {
-    temp = signals;
+    if (signals.size() > 0)
+        temp = signals;
+
+}
+
+void ParseXml::getConfigList(std::vector<std::string> &temp)
+{
+    if (config.size() > 0) 
+       temp = config;
 }

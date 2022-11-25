@@ -14,9 +14,10 @@ class OpcUaClient
 public:
 	OpcUaClient();
 	virtual ~OpcUaClient();
-	void subLoop(std::string address);
+	void subLoop();
 	void stopSession();
 private:
+	UA_Client* client;
 	static void handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* subContext,
 		UA_UInt32 monId, void* monContext, 
 		UA_DataValue* value);

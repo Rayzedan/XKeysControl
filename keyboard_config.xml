@@ -3,7 +3,6 @@
 	<OpcServer>
 		<ServerAddress value="opc.tcp://localhost:62544" />
 	</OpcServer>
-  <RequestTime value="1" />
   <UpdateClientTime value="5" />
   <SetupDeviceTime value="30" />
   <Buttons>

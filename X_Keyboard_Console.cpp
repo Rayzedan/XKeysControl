@@ -9,6 +9,7 @@ int __cdecl _tmain()
 	setlocale(LC_ALL, "Russian");
 	OpcUaClient* worker = new OpcUaClient();
 
-	worker->subLoop("opc.tcp://localhost:62544");
+	worker->subLoop();
 	//delete worker;
+	return 0;
 }

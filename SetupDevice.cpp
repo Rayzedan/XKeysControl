@@ -8,12 +8,26 @@ DWORD result;
 long hnd;
 DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error);
 DWORD __stdcall HandleErrorEvent(DWORD deviceID, DWORD status);
+void installDevice();
 void callbackSetLED(int indexButton, int indexState);
 int readlength = 0;
 std::map<int, int>buttonsMap;
+bool isDeviceEnable = false;
+DWORD timeoutDevice = 30;
 
 SetupDevice::SetupDevice() 
 {	
+	installDevice();
+}
+
+SetupDevice::~SetupDevice() 
+{
+	std::cout << "DELETE SETUP DEVICE\n";
+}
+
+void installDevice()
+{
+	std::cout << "setup device...\n";
 	TEnumHIDInfo info[128];
 	result = 0;
 	hnd = 0;
@@ -50,6 +64,7 @@ SetupDevice::SetupDevice()
 			}
 			else
 			{
+				isDeviceEnable = true;
 				switch (pid)
 				{
 				case 1089:
@@ -143,10 +158,6 @@ SetupDevice::SetupDevice()
 	}
 }
 
-SetupDevice::~SetupDevice() 
-{
-	//std::cout << "DELETE SETUP DEVICE\n";
-}
 void callbackSetLED(int indexButton, int indexState)
 {	
 	buffer[1] = 181;	
@@ -908,6 +919,12 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 		CleanupInterface(hnd);
 		MessageBeep(MB_ICONHAND);
 		std::cout << "Device disconnected\n";
+		isDeviceEnable = false;
+		while (!isDeviceEnable)
+		{
+			Sleep(timeoutDevice*1000);
+			installDevice();
+		}
 	}
 	return TRUE;
 }
@@ -917,4 +934,51 @@ DWORD __stdcall HandleErrorEvent(DWORD deviceID, DWORD status)
 	MessageBeep(MB_ICONHAND);
 	std::cout << "Error from error callback\n";
 	return TRUE;
+}
+
+void SetupDevice::setTimeoutDevice(DWORD timeout)
+{
+	timeoutDevice = timeout;
+}
+
+void SetupDevice::setAllRed()
+{
+	buffer[0] = 0;
+	buffer[1] = 182;
+	buffer[2] = 1; //0 for bank 1, 1 for bank 2
+	buffer[3] = 255;
+	result = 404;
+	while (result == 404)
+	{
+		result = WriteData(hnd, buffer);
+	}
+
+	buffer[2] = 0; //0 for bank 1, 1 for bank 2
+	buffer[3] = 0;
+	result = 404;
+	while (result == 404)
+	{
+		result = WriteData(hnd, buffer);
+	}
+}
+
+void SetupDevice::setAllBlue()
+{
+	buffer[0] = 0;
+	buffer[1] = 182;
+	buffer[2] = 0; //0 for bank 1, 1 for bank 2
+	buffer[3] = 255;
+	result = 404;
+	while (result == 404)
+	{
+		result = WriteData(hnd, buffer);
+	}
+
+	buffer[2] = 1; //0 for bank 1, 1 for bank 2
+	buffer[3] = 0;
+	result = 404;
+	while (result == 404)
+	{
+		result = WriteData(hnd, buffer);
+	}
 }
