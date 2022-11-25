@@ -315,17 +315,6 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 					//do release action
 				}
 				break;
-
-			case 10: //button 10
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
 			case 11: //button 11
 				if (state == 1) //key was pressed
 				{
@@ -399,70 +388,6 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 					//do release action
 				}
 				break;
-
-			case 18: //button 18
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 19: //button 19
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-
-			case 20: //button 20
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 21: //button 21
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-
-			case 22: //button 22
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 23: //button 23
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-				//Next column of buttons
 			case 24: //button 24
 				if (state == 1) //key was pressed
 				{
@@ -474,17 +399,6 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 				}
 				break;
 			case 25: //button 25
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-
-			case 26: //button 26
 				if (state == 1) //key was pressed
 				{
 					callbackSetLED(keynum, 1);
@@ -567,17 +481,6 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 					//do release action
 				}
 				break;
-
-			case 34: //button 34
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
 			case 35: //button 35
 				if (state == 1) //key was pressed
 				{
@@ -620,8 +523,6 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 					//do release action
 				}
 				break;
-
-
 			case 39: //button 39
 				if (state == 1) //key was pressed
 				{
@@ -643,7 +544,6 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 					//do release action
 				}
 				break;
-
 			case 41: //button 41
 				if (state == 1) //key was pressed
 				{
@@ -654,18 +554,6 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 					//do release action
 				}
 				break;
-
-			case 42: //button 42
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-
 			case 43: //button 43
 				if (state == 1) //key was pressed
 				{
@@ -709,7 +597,6 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 					//do release action
 				}
 				break;
-
 			case 47: //button 47
 				if (state == 1) //key was pressed
 				{
@@ -731,7 +618,6 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 					//do release action
 				}
 				break;
-
 			case 49: //button 49
 				if (state == 1) //key was pressed
 				{
@@ -742,18 +628,6 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 					//do release action
 				}
 				break;
-
-			case 50: //button 50
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-
 			case 51: //button 51
 				if (state == 1) //key was pressed
 				{
@@ -764,7 +638,6 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 					//do release action
 				}
 				break;
-
 			case 52: //button 52
 				if (state == 1) //key was pressed
 				{
@@ -775,7 +648,6 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 					//do release action
 				}
 				break;
-
 			case 53: //button 53
 				if (state == 1) //key was pressed
 				{
@@ -786,7 +658,6 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 					//do release action
 				}
 				break;
-
 			case 54: //button 54
 				if (state == 1) //key was pressed
 				{
@@ -828,7 +699,7 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 					//do release action
 				}
 				break;
-			case 58: //button 58
+			case 64: //button 57
 				if (state == 1) //key was pressed
 				{
 					callbackSetLED(keynum, 1);
@@ -838,7 +709,7 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 					//do release action
 				}
 				break;
-			case 59: //button 59
+			case 65: //button 57
 				if (state == 1) //key was pressed
 				{
 					callbackSetLED(keynum, 1);
@@ -848,7 +719,117 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 					//do release action
 				}
 				break;
-			case 60: //button 60
+			case 67: //button 57
+				if (state == 1) //key was pressed
+				{
+					callbackSetLED(keynum, 1);
+				}
+				else if (state == 3) //key was released
+				{
+					//do release action
+				}
+				break;
+			case 68: //button 57
+				if (state == 1) //key was pressed
+				{
+					callbackSetLED(keynum, 1);
+				}
+				else if (state == 3) //key was released
+				{
+					//do release action
+				}
+				break;
+			case 69: //button 57
+				if (state == 1) //key was pressed
+				{
+					callbackSetLED(keynum, 1);
+				}
+				else if (state == 3) //key was released
+				{
+					//do release action
+				}
+				break;
+			case 70: //button 57
+				if (state == 1) //key was pressed
+				{
+					callbackSetLED(keynum, 1);
+				}
+				else if (state == 3) //key was released
+				{
+					//do release action
+				}
+				break;
+			case 71: //button 57
+				if (state == 1) //key was pressed
+				{
+					callbackSetLED(keynum, 1);
+				}
+				else if (state == 3) //key was released
+				{
+					//do release action
+				}
+				break;
+			case 72: //button 57
+				if (state == 1) //key was pressed
+				{
+					callbackSetLED(keynum, 1);
+				}
+				else if (state == 3) //key was released
+				{
+					//do release action
+				}
+				break;
+			case 73: //button 57
+				if (state == 1) //key was pressed
+				{
+					callbackSetLED(keynum, 1);
+				}
+				else if (state == 3) //key was released
+				{
+					//do release action
+				}
+				break;
+			case 75: //button 57
+				if (state == 1) //key was pressed
+				{
+					callbackSetLED(keynum, 1);
+				}
+				else if (state == 3) //key was released
+				{
+					//do release action
+				}
+				break;
+			case 76: //button 57
+				if (state == 1) //key was pressed
+				{
+					callbackSetLED(keynum, 1);
+				}
+				else if (state == 3) //key was released
+				{
+					//do release action
+				}
+				break;
+			case 77: //button 57
+				if (state == 1) //key was pressed
+				{
+					callbackSetLED(keynum, 1);
+				}
+				else if (state == 3) //key was released
+				{
+					//do release action
+				}
+				break;
+			case 78:
+				if (state == 1) //key was pressed
+				{
+					callbackSetLED(keynum, 1);
+				}
+				else if (state == 3) //key was released
+				{
+					//do release action
+				}
+				break;
+			case 79: //button 60
 				if (state == 1) //key was pressed
 				{
 					callbackSetLED(keynum, 1);

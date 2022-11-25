@@ -8,7 +8,7 @@
   <Buttons>
 	<Button  Number="1" EnableOPC="1" SignalPath="Object.error" />	
 	<Button  Number="2" EnableOPC="1" SignalPath="Object.CRITICAL" />
-	<Button  Number="3" EnableOPC="1" SignalPath="Object.WARNING" />
+	<Button  Number="59" EnableOPC="1" SignalPath="Object.WARNING" />
 	<Button  Number="60" EnableOPC="1" SignalPath="Object.ERROR_1" />
   </Buttons>
 </configuration>
