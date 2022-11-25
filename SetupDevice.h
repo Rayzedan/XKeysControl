@@ -10,6 +10,7 @@ public:
 	void setAllRed();
 	void setAllBlue();
 	void setTimeoutDevice(DWORD timeout);
+	void initialDevice();
 private:
 
 };

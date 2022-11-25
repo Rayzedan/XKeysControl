@@ -5,14 +5,21 @@
 #include <vector>
 
 UA_Boolean running;
-SetupDevice* device = new SetupDevice();
-ParseXml* file = new ParseXml();
 std::map<int, std::pair<std::string, int>> signalMap;
 std::map<int, int> subcribeMap;
 std::vector<std::string> config;
+DWORD timeout = 30;
+SetupDevice* device = new SetupDevice();
+ParseXml* file = new ParseXml();
+
 
 OpcUaClient::OpcUaClient() 
 {
+    file->getSignalMap(signalMap);
+    file->getConfigList(config);
+    timeout = atoi(config[2].c_str());
+    device->setTimeoutDevice(timeout);
+    device->initialDevice();
     client = UA_Client_new();
     running = true;
 }
@@ -137,10 +144,6 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
 
 void OpcUaClient::subLoop() 
 {
-    file->getSignalMap(signalMap);
-    file->getConfigList(config);
-    DWORD timeout = atoi(config[2].c_str());
-    device->setTimeoutDevice(timeout);
     int requestClientTime = 5;
     requestClientTime = atoi(config[1].c_str());
     std::cout << "IP - " << config[0] << '\n';
