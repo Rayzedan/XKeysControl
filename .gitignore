@@ -1,4 +1,8 @@
 .vs
 x64
+<<<<<<< HEAD
 Debug
 *.dll
+=======
+Debug
+>>>>>>> 4df2694 (init project)
