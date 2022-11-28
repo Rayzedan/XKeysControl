@@ -20,9 +20,6 @@ public:
 private:
 	ParseXml* file;
 	UA_Client* client;
-	static void readValueAttributeCallback(UA_Client* client, void* userdata,
-			UA_UInt32 requestId, UA_StatusCode status,
-			UA_DataValue* var);
 	static void handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* subContext,
 		UA_UInt32 monId, void* monContext, 
 		UA_DataValue* value);
