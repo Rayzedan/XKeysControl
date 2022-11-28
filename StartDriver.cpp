@@ -4,7 +4,7 @@
 #include "StdAfx.h"
 #include "WindowsService.h"
 #include <ServiceInstaller.h>
-
+#include <Windows.h>
 using namespace std;
 
 int wmain(int argc, wchar_t* argv[])

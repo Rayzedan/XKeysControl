@@ -117,9 +117,6 @@ DWORD __stdcall CSampleService::ServiceRunner(void* self)
             pService->WriteLogEntry(L"Astra.XKeysDrivere is working:\n", EVENTLOG_INFORMATION_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
             if (worker->subLoop() == -1)
                 pService->WriteLogEntry(L"Astra.XKeysDrivere can`t read xml-map",EVENTLOG_ERROR_TYPE,MSG_OPERATION, CATEGORY_SERVICE);
-            else
-                pService->WriteLogEntry(L"Astra.XKeysDrivere read xml-map", EVENTLOG_ERROR_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
-
         }
  
         // Just pretend to do some work

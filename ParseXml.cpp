@@ -1,13 +1,14 @@
 #include "ParseXml.h"
-#include <iostream>
+#include <Windows.h>
+#include <algorithm>
 
 ParseXml::ParseXml() 
 {
-    std::cout << "Create ParseXml\n";	
+
 }
 ParseXml::~ParseXml() 
 {
-    std::cout << "DELETE PARSE XML\n";
+
 }
 
 void ParseXml::getSignalMap(std::map<int, std::pair<std::string, int>>& temp)
@@ -32,8 +33,19 @@ void ParseXml::getConfigList(std::vector<std::string> &temp)
 
 int ParseXml::getConfigFile()
 {
+    TCHAR tempPath[MAX_PATH]; //or wchar_t * buffer;
+    GetModuleFileName(NULL, tempPath, MAX_PATH);
+    std::string path(tempPath);
+    std::string xmlPath = "\\keyboard_config.xml";
+    size_t index = path.rfind('\\');
+    if (index != std::string::npos) {
+        path.replace(index,xmlPath.size()+2, xmlPath);
+        std::string::iterator iter = std::find(path.begin(), path.end(), '/');
+        if (iter < path.end())
+            std::replace(++iter, path.end(), '/', '\\');
+    }
     pugi::xml_document doc;
-    pugi::xml_parse_result result = doc.load_file("C://Users//d.bezlepkin//source//repos//Astra.XKeysDriver//x64//Release//keyboard_config.xml");
+    pugi::xml_parse_result result = doc.load_file(path.c_str());
     if (result) {
         pugi::xml_node tools = doc.child("configuration").child("Buttons");
         for (pugi::xml_node tool = tools.first_child(); tool; tool = tool.next_sibling())

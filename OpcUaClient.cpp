@@ -4,6 +4,7 @@
 #include <map>
 #include "SetupDevice.h"
 #include "ParseXml.h"
+
 UA_Boolean running;
 std::map<int, std::pair<std::string, int>> signalMap;
 std::map<int, int> subcribeMap;
@@ -38,7 +39,7 @@ void OpcUaClient::handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* s
         //    std::cout << "KEY - " << item.first << " VALUE - " << item.second << std::endl;
         //}
         if (error) {
-            //std::cout << "index - " << index << std::endl;
+            std::cout << "index - " << index << std::endl;
             device->setLED(index, 2);
         }
         else {
@@ -116,6 +117,8 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
                     int key = response.subscriptionId;
                     int value = item.first;
                     subcribeMap[key] = value;
+                    //if (value == 2)
+                    //    device->setLED()
                     //std::cout << "KEY - " << key << " INDEX BUTTON - " << value << std::endl;
                 }
             }                       
@@ -143,9 +146,6 @@ int OpcUaClient::subLoop()
         client = UA_Client_new();
         int requestClientTime = 5;
         requestClientTime = atoi(config[1].c_str());
-        std::cout << "IP - " << config[0] << '\n';
-        std::cout << "TIMEOUT - " << timeout << '\n';
-        std::cout << "REQUEST CLIENT TIME - " << requestClientTime << '\n';
         UA_Boolean value = 0;
         UA_UInt32 reqId = 0;
         UA_ClientConfig* cc = UA_Client_getConfig(client);
@@ -175,7 +175,6 @@ int OpcUaClient::subLoop()
         return -1;
     }
    
-    return 0;
     /* Clean up */
     UA_Client_delete(client); /* Disconnects the client internally */
 }
