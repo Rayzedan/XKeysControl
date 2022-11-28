@@ -28,21 +28,15 @@ OpcUaClient::OpcUaClient()
 
 OpcUaClient::~OpcUaClient() 
 {
-    std::cout << "DELETE OPC UA CLIENT\n";
-
-}
-
-void OpcUaClient::readValueAttributeCallback(UA_Client* client, void* userdata, UA_UInt32 requestId, UA_StatusCode status, UA_DataValue* var)
-{
-    std::cout << "read value attribute callback, status is " << status << std::endl;
+    //std::cout << "DELETE OPC UA CLIENT\n";
 
 }
 
 void OpcUaClient::handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* subContext, UA_UInt32 monId, void* monContext, UA_DataValue* value)
 {
-    int key = subId;
     if (UA_Variant_hasScalarType(&value->value, &UA_TYPES[UA_TYPES_BOOLEAN])) 
-    {        
+    {
+        int key = subId;
         int index = subcribeMap[key].indexButton;
         bool isEnable = subcribeMap[key].isSignalGood;
         UA_Boolean error = *(UA_Boolean*)value->value.data;        
@@ -157,6 +151,8 @@ int OpcUaClient::subLoop()
         client = UA_Client_new();
         int requestClientTime = 5;
         requestClientTime = atoi(config[1].c_str());
+        std::cout << "Device timeout - " << timeout << std::endl;
+        std::cout << "Request client time - " << requestClientTime << std::endl;
         UA_Boolean value = 0;
         UA_UInt32 reqId = 0;
         UA_ClientConfig* cc = UA_Client_getConfig(client);
@@ -171,12 +167,19 @@ int OpcUaClient::subLoop()
             /* Alternatively you can also use UA_Client_getState to get the current state */
             UA_StatusCode retval = UA_Client_connect(client, config[0].c_str());
             if (retval != UA_STATUSCODE_GOOD) {
-                UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-                    "Not connected. Retrying to connect in 5 second");
-                /* The connect may timeout after 1 second (see above) or it may fail immediately on network errors */
-                /* E.g. name resolution errors or unreachable network. Thus there should be a small sleep here */
+                std::cout << "Not connected. Retrying to connect in " << requestClientTime << " second\n";
                 UA_sleep_ms(requestClientTime * 1000);
                 continue;
+            }
+            for (std::map<int, signalNode>::iterator a = subcribeMap.begin(); a != subcribeMap.end(); a++)
+            {           
+                UA_Variant status;
+                UA_Variant_init(&status);
+                UA_StatusCode retval;
+                retval = UA_Client_readValueAttribute(client, a->second.node, &status);
+                bool isEnable = UA_StatusCode_isGood(retval);
+                a->second.isSignalGood = isEnable;
+                //std::cout  << "signal is good - " << isEnable << std::endl;
             }
             UA_Client_run_iterate(client, requestClientTime * 1000);
         }
