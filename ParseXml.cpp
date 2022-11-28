@@ -2,26 +2,18 @@
 #include <iostream>
 ParseXml::ParseXml() 
 {
-<<<<<<< HEAD
     std::cout << "Create ParseXml\n";
-=======
->>>>>>> 4df2694 (init project)
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file("keyboard_config.xml");	
     pugi::xml_node tools = doc.child("configuration").child("Buttons");
 
     for (pugi::xml_node tool = tools.first_child(); tool; tool = tool.next_sibling())
-<<<<<<< HEAD
     {       
-=======
-    {      
->>>>>>> 4df2694 (init project)
         int key = 0;
         int enableOpc = 0;
         std::string signalPath;      
         for (pugi::xml_attribute attr = tool.first_attribute(); attr; attr = attr.next_attribute())
         {           
-<<<<<<< HEAD
             std::string name = attr.name();   
             if (name == "EnableOPC") {
                 enableOpc = atoi(attr.value());
@@ -31,26 +23,11 @@ ParseXml::ParseXml()
             }
             else if (name == "Number") {
                 key = convertIndexButton(atoi(attr.value()));
-=======
-            std::string name = attr.name();
-            if (name == "EnableOPC") {
-                enableOpc = atoi(attr.value());
-                std::cout << "enableOpc - " << enableOpc << std::endl;
-            }
-            else if (name == "SignalPath") {
-               signalPath = attr.value();
-               std::cout << "signalPath - " << signalPath << std::endl;
-            }
-            else if (name == "Number") {
-                key = atoi(attr.value());
-                std::cout << "KEY - " << key << std::endl;             
->>>>>>> 4df2694 (init project)
             }
         }
         signals[key].first = signalPath;
         signals[key].second = enableOpc;
     }
-<<<<<<< HEAD
     tools = doc.child("configuration").child("OpcServer");
     for (pugi::xml_node tool = tools.first_child(); tool; tool = tool.next_sibling())
     {
@@ -69,8 +46,6 @@ ParseXml::ParseXml()
             config.push_back(attr.value());
         }
     }
-=======
->>>>>>> 4df2694 (init project)
 }
 ParseXml::~ParseXml() 
 {
@@ -79,7 +54,6 @@ ParseXml::~ParseXml()
 
 void ParseXml::getSignalMap(std::map<int, std::pair<std::string, int>>& temp)
 {
-<<<<<<< HEAD
     if (signals.size() > 0)
         temp = signals;
 
@@ -307,7 +281,3 @@ int ParseXml::convertIndexButton(int index)
         break;
     }
 }
-=======
-    temp = signals;
-}
->>>>>>> 4df2694 (init project)

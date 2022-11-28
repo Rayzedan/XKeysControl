@@ -3,7 +3,6 @@
 	<OpcServer>
 		<ServerAddress value="opc.tcp://localhost:62544" />
 	</OpcServer>
-<<<<<<< HEAD
   <UpdateClientTime value="5" />
   <SetupDeviceTime value="5" />
   <Buttons>
@@ -11,16 +10,5 @@
 	<Button  Number="2" EnableOPC="1" SignalPath="Object.CRITICAL" />
 	<Button  Number="59" EnableOPC="1" SignalPath="Object.WARNING" />
 	<Button  Number="60" EnableOPC="1" SignalPath="Object.ERROR_1" />
-=======
-  <RequestTime value="1" />
-  <UpdateClientTime value="5" />
-  <SetupDeviceTime value="30" />
-  <Buttons>
-	<Button  Number="1" EnableOPC="1" SignalPath="Object.error" />
-	<Button  Number="4" EnableOPC="0" SignalPath="Object.low" />
-	<Button  Number="5" EnableOPC="1" SignalPath="Object.CRITICAL" />
-	<Button  Number="6" EnableOPC="1" SignalPath="Object.WARNING" />
-	<Button  Number="7" EnableOPC="1" SignalPath="Object.ERROR_1" />
->>>>>>> 4df2694 (init project)
   </Buttons>
 </configuration>

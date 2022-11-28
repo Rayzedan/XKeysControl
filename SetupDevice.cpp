@@ -1,6 +1,5 @@
 #include "SetupDevice.h"
 #include <iostream>
-<<<<<<< HEAD
 #include <map>
 
 BYTE buffer[80]{};
@@ -34,19 +33,11 @@ void SetupDevice::initialDevice()
 void installDevice()
 {
 	std::cout << "setup device...\n";
-=======
-
-BYTE buffer[80]{};
-
-SetupDevice::SetupDevice() 
-{
->>>>>>> 4df2694 (init project)
 	TEnumHIDInfo info[128];
 	result = 0;
 	hnd = 0;
 	long count = 0;
 	int pid;
-<<<<<<< HEAD
 	result = EnumeratePIE(0x5F3, info, count);	
 	while (result!=0)
 	{
@@ -54,21 +45,6 @@ SetupDevice::SetupDevice()
 		std::cout << "No PI Engineering Devices Found\n";
 		std::cout << "Trying to find a device...\n";
 		result = EnumeratePIE(0x5F3, info, count);
-=======
-	result = EnumeratePIE(0x5F3, info, count);
-
-	if (result != 0)
-	{
-		if (result == 102) {
-			std::cout << "No PI Engineering Devices Found\n";
-		}
-		else {
-			std::cout << "Error finding PI Engineering Devices\n";
-		}
-	}
-	else if (count == 0) {
-		std::cout << "No PI Engineering Devices Found\n";
->>>>>>> 4df2694 (init project)
 	}
 	for (long i = 0; i < count; ++i) {
 		pid = info[i].PID; //get the device pid
@@ -83,18 +59,11 @@ SetupDevice::SetupDevice()
 			result = SetupInterfaceEx(hnd);
 			if (result != 0)
 			{
-<<<<<<< HEAD
 				//std::cout << "Error setting up PI Engineering Device\n";
 			}
 			else
 			{
 				isDeviceEnable = true;
-=======
-				std::cout << "Error setting up PI Engineering Device\n";
-			}
-			else
-			{
->>>>>>> 4df2694 (init project)
 				switch (pid)
 				{
 				case 1089:
@@ -129,45 +98,18 @@ SetupDevice::SetupDevice()
 		}
 	}
 	if (result == 0) {
-<<<<<<< HEAD
 		//Turn on the data callback
 		result = SetDataCallback(hnd, HandleDataEvent);
 		result = SetErrorCallback(hnd, HandleErrorEvent);
 		SuppressDuplicateReports(hnd, true);
 		DisableDataCallback(hnd, false); //turn on callback in the case it was turned off by some other command
 
-=======
-		//Key Index (in decimal)
-		//Bank 1
-		//Columns-->
-		//  0   8   16  24  32  40  48  56  64  72
-		//  1   9   17  25  33  41  49  57  65  73
-
-		//  3   11      27  35  43  51      67  75
-		//  4   12      28  36  44  52      68  76
-		//  5   13      29  37  45  53      69  77
-		//  6   14      30  38  46  54      70  78
-		//  7   15      31  39  47  55      71  79
-
-		//Bank 2
-		//Columns-->
-		//  80	88	96	104	112	120	128	136	144	152
-		//  81	89	97	105	113	121	129	137	145	153
-
-		//  83	91		107	115	123	131		147	155
-		//  84	92		108	116	124	132		148	156
-		//  85	93		109	117	125	133		149	157
-		//	86	94		110	118	126	134		150	158
-		//  87  95      111 119 127 135     151 159
-		std::cout << "Change LED\n";
->>>>>>> 4df2694 (init project)
 		int wlen = GetWriteLength(hnd);
 		int indexButton = 0, indexState = 0;
 		for (int i = 0; i < wlen; i++)
 		{
 			buffer[i] = 0;
 		}
-<<<<<<< HEAD
 		buffer[1] = 179; //0xb3
 		buffer[2] = 6; //6=green, 7=red
 		buffer[3] = 1;
@@ -177,9 +119,6 @@ SetupDevice::SetupDevice()
 			result = WriteData(hnd, buffer);
 		}
 		
-=======
-		buffer[0] = 0;
->>>>>>> 4df2694 (init project)
 		buffer[1] = 182;
 		buffer[2] = 0; //0 for bank 1, 1 for bank 2
 		buffer[3] = 255;
@@ -203,7 +142,6 @@ SetupDevice::SetupDevice()
 	}
 }
 
-<<<<<<< HEAD
 void callbackSetLED(int indexButton, int indexState)
 {	
 	buffer[1] = 181;	
@@ -219,21 +157,12 @@ void callbackSetLED(int indexButton, int indexState)
 			}
 		}
 	}
-=======
-SetupDevice::~SetupDevice() 
-{
-	std::cout << "DELETE SETUP DEVICE\n";
->>>>>>> 4df2694 (init project)
 }
 
 void SetupDevice::setLED(int indexButton, int indexState)
 {
 	buffer[1] = 181;
-<<<<<<< HEAD
 	//std::cout << "INDEX BUTTON - " << indexButton << " INDEX STATE - " << indexState;
-=======
-	std::cout << "INDEX BUTTON - " << indexButton << " INDEX STATE - " << indexState;
->>>>>>> 4df2694 (init project)
 	if (indexState == 1) {
 		buffer[2] = indexButton + 80;
 		buffer[3] = 0;
@@ -244,10 +173,7 @@ void SetupDevice::setLED(int indexButton, int indexState)
 		}
 		buffer[2] = indexButton;
 		buffer[3] = indexState;
-<<<<<<< HEAD
 		buttonsMap[indexButton] = 1;
-=======
->>>>>>> 4df2694 (init project)
 		result = 404;
 		while (result == 404)
 		{
@@ -257,10 +183,7 @@ void SetupDevice::setLED(int indexButton, int indexState)
 	else {
 		buffer[2] = indexButton;
 		buffer[3] = 0;
-<<<<<<< HEAD
 		buttonsMap[indexButton] = 0;
-=======
->>>>>>> 4df2694 (init project)
 		result = 404;
 		while (result == 404)
 		{
@@ -275,7 +198,6 @@ void SetupDevice::setLED(int indexButton, int indexState)
 		}
 	}
 }
-<<<<<<< HEAD
 
 DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 {	
@@ -1021,5 +943,3 @@ void SetupDevice::setAllBlue()
 		result = WriteData(hnd, buffer);
 	}
 }
-=======
->>>>>>> 4df2694 (init project)
