@@ -10,6 +10,7 @@ public:
 	virtual ~ParseXml();
 	void getSignalMap(std::map<int, std::pair<std::string, int>>& temp);
 	void getConfigList(std::vector<std::string>& temp);
+	int getConfigFile();
 private:
 	int convertIndexButton(int index);
 	std::map<int, std::pair<std::string, int>> signals;

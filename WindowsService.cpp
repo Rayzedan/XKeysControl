@@ -115,11 +115,15 @@ DWORD __stdcall CSampleService::ServiceRunner(void* self)
         {
             // Log multi-line message
             pService->WriteLogEntry(L"Astra.XKeysDrivere is working:\n", EVENTLOG_INFORMATION_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
-            worker->subLoop();
-        }
+            if (worker->subLoop() == -1)
+                pService->WriteLogEntry(L"Astra.XKeysDrivere can`t read xml-map",EVENTLOG_ERROR_TYPE,MSG_OPERATION, CATEGORY_SERVICE);
+            else
+                pService->WriteLogEntry(L"Astra.XKeysDrivere read xml-map", EVENTLOG_ERROR_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
 
+        }
+ 
         // Just pretend to do some work
-        Sleep(5000);
+        //Sleep(5000);
     }
 
     // Signal the stopped event.
@@ -137,6 +141,7 @@ void CSampleService::OnStop()
     // main service function (ServiceWorkerThread).
     m_bIsStopping = TRUE;
     worker->stopSession();
+
     if (WaitForSingleObject(m_hHasStoppedEvent, INFINITE) != WAIT_OBJECT_0)
     {
         throw GetLastError();
