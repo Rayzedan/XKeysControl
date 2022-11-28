@@ -6,8 +6,14 @@
 #include "ParseXml.h"
 
 UA_Boolean running;
+struct signalNode
+{
+    int indexButton;
+    UA_NodeId node;
+    bool isSignalGood;
+};
 std::map<int, std::pair<std::string, int>> signalMap;
-std::map<int, int> subcribeMap;
+std::map<int, signalNode> subcribeMap;
 std::vector<std::string> config;
 DWORD timeout = 30;
 SetupDevice* device = new SetupDevice();
@@ -26,25 +32,28 @@ OpcUaClient::~OpcUaClient()
 
 }
 
+void OpcUaClient::readValueAttributeCallback(UA_Client* client, void* userdata, UA_UInt32 requestId, UA_StatusCode status, UA_DataValue* var)
+{
+    std::cout << "read value attribute callback, status is " << status << std::endl;
+
+}
+
 void OpcUaClient::handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* subContext, UA_UInt32 monId, void* monContext, UA_DataValue* value)
 {
-    if (UA_Variant_hasScalarType(&value->value, &UA_TYPES[UA_TYPES_BOOLEAN])) {
-        UA_Boolean error = *(UA_Boolean*)value->value.data;
-        int temp = subId;
-        
-        //std::cout << "MON ID - " << temp << std::endl;
-        //std::cout << "SUB ID - " << value->value.type << std::endl;
-        int index = subcribeMap[temp];
-        //for (const auto& item : subcribeMap) {
-        //    std::cout << "KEY - " << item.first << " VALUE - " << item.second << std::endl;
-        //}
+    int key = subId;
+    if (UA_Variant_hasScalarType(&value->value, &UA_TYPES[UA_TYPES_BOOLEAN])) 
+    {        
+        int index = subcribeMap[key].indexButton;
+        bool isEnable = subcribeMap[key].isSignalGood;
+        UA_Boolean error = *(UA_Boolean*)value->value.data;        
+        std::cout << "status code - " << isEnable << std::endl;
         if (error) {
-            std::cout << "index - " << index << std::endl;
-            device->setLED(index, 2);
+            std::cout << "error - " << index << std::endl;
+            device->setLED(index, 2, isEnable);
         }
         else {
-            std::cout << "index - " << index << std::endl;
-            device->setLED(index, 1);
+            std::cout << "default - " << index << std::endl;
+            device->setLED(index, 1, isEnable);
         }      
     }
 }
@@ -103,23 +112,25 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
                     return;
                 UA_NodeId currentNode =
                     UA_NODEID_STRING(1, _strdup(item.second.first.c_str()));
+
                 UA_MonitoredItemCreateRequest monRequest =
                     UA_MonitoredItemCreateRequest_default(currentNode);
-
                 UA_MonitoredItemCreateResult monResponse =
                     UA_Client_MonitoredItems_createDataChange(client, response.subscriptionId,
                         UA_TIMESTAMPSTORETURN_BOTH, monRequest,
                         NULL, handlerNodeChanged, NULL);
                 if (monResponse.statusCode == UA_STATUSCODE_GOOD) {
-                    //UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-                    //    "Monitoring, id %u",
-                    //    monResponse.monitoredItemId);
+                    UA_Variant status;
+                    UA_Variant_init(&status);
+                    UA_StatusCode retval;
+                    retval = UA_Client_readValueAttribute(client, currentNode, &status);
                     int key = response.subscriptionId;
                     int value = item.first;
-                    subcribeMap[key] = value;
-                    //if (value == 2)
-                    //    device->setLED()
-                    //std::cout << "KEY - " << key << " INDEX BUTTON - " << value << std::endl;
+                    bool isEnable = UA_StatusCode_isGood(retval);
+                    subcribeMap[key].indexButton = value;
+                    subcribeMap[key].isSignalGood = isEnable;
+                    subcribeMap[key].node = currentNode;
+                    std::cout << "KEY - " << key << " index button - " << value << " isGoodSignal - " << isEnable << std::endl;
                 }
             }                       
         }
@@ -167,7 +178,6 @@ int OpcUaClient::subLoop()
                 UA_sleep_ms(requestClientTime * 1000);
                 continue;
             }
-
             UA_Client_run_iterate(client, requestClientTime * 1000);
         }
     }
