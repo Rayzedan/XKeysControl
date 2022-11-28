@@ -4,6 +4,9 @@
 #include <iostream>
 #include "OpcUaClient.h"
 
+OpcUaClient* worker = new OpcUaClient();
+
+
 CSampleService::CSampleService(PCWSTR pszServiceName,
                                BOOL fCanStop,
                                BOOL fCanShutdown,
@@ -102,7 +105,7 @@ void CSampleService::Run()
 DWORD __stdcall CSampleService::ServiceRunner(void* self)
 {
     CSampleService* pService = (CSampleService*)self;
-    //OpcUaClient* worker = new OpcUaClient();
+
     pService->WriteLogEntry(L"Astra.XKeysDriver has started.", EVENTLOG_INFORMATION_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
 
     // Periodically check if the service is stopping.
@@ -112,7 +115,7 @@ DWORD __stdcall CSampleService::ServiceRunner(void* self)
         {
             // Log multi-line message
             pService->WriteLogEntry(L"Astra.XKeysDrivere is working:\n", EVENTLOG_INFORMATION_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
-            //worker->subLoop();
+            worker->subLoop();
         }
 
         // Just pretend to do some work
@@ -133,7 +136,7 @@ void CSampleService::OnStop()
     // Indicate that the service is stopping and wait for the finish of the
     // main service function (ServiceWorkerThread).
     m_bIsStopping = TRUE;
-
+    worker->stopSession();
     if (WaitForSingleObject(m_hHasStoppedEvent, INFINITE) != WAIT_OBJECT_0)
     {
         throw GetLastError();
