@@ -42,8 +42,6 @@ void installDevice()
 	while (result!=0)
 	{
 		Sleep(timeoutDevice * 1000);
-		std::cout << "No PI Engineering Devices Found\n";
-		std::cout << "Trying to find a device...\n";
 		result = EnumeratePIE(0x5F3, info, count);
 	}
 	for (long i = 0; i < count; ++i) {
@@ -63,37 +61,7 @@ void installDevice()
 			}
 			else
 			{
-				isDeviceEnable = true;
-				switch (pid)
-				{
-				case 1089:
-					std::cout << "Found Device: XK-80, PID=1089 (PID #1)\n";
-					break;
-				case 1090:
-					std::cout << "Found Device: XK-80, PID=1090 (PID #2)\n";
-					break;
-				case 1091:
-					std::cout << "Found Device: XK-80, PID=1091 (PID #3)\n";
-					break;
-				case 1250:
-					std::cout << "Found Device: XK-80, PID=1250 (PID #4)\n";
-					break;
-				case 1121:
-					std::cout << "Found Device: XK-60, PID=1121 (PID #1)\n";
-					break;
-				case 1122:
-					std::cout << "Found Device: XK-60, PID=1122 (PID #2)\n";
-					break;
-				case 1123:
-					std::cout << "Found Device: XK-60, PID=1123 (PID #3)\n";
-					break;
-				case 1254:
-					std::cout << "Found Device: XK-60, PID=1254 (PID #4)\n";
-					break;
-				default:
-					std::cout << "Unknown device found\n";
-					break;
-				}
+				isDeviceEnable = true;			
 			}
 		}
 	}
@@ -153,7 +121,6 @@ void callbackSetLED(int indexButton, int indexState)
 			while (result == 404)
 			{
 				result = WriteData(hnd, buffer);
-				std::cout << "result write - " << result << std::endl;
 			}
 		}
 	}
@@ -907,6 +874,15 @@ void SetupDevice::setAllRed()
 
 void SetupDevice::setAllBlue()
 {
+	if (buttonsMap.size() > 0) {
+		for (auto const& item : buttonsMap)
+		{
+			std::cout << "find prev value\n";
+			if (item.second == 0) {
+				setLED(item.first, 2);
+			}
+		}
+	}
 	buffer[1] = 179; //0xb3
 	buffer[2] = 7; //6=green, 7=red
 	buffer[3] = 0;
