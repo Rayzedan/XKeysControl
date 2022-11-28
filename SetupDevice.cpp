@@ -162,7 +162,7 @@ void callbackSetLED(int indexButton, int indexState)
 void SetupDevice::setLED(int indexButton, int indexState)
 {
 	buffer[1] = 181;
-	//std::cout << "INDEX BUTTON - " << indexButton << " INDEX STATE - " << indexState;
+	std::cout << "INDEX BUTTON - " << indexButton << " INDEX STATE - " << indexState << std::endl;
 	if (indexState == 1) {
 		buffer[2] = indexButton + 80;
 		buffer[3] = 0;
@@ -228,7 +228,7 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 			case 0: //button 0 (top left)
 				if (state == 1) //key was pressed
 				{
-					std::cout << "key 1 was pressed\n";
+					//std::cout << "key 1 was pressed\n";
 					callbackSetLED(keynum, 1);
 				}
 				break;

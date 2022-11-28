@@ -10,7 +10,7 @@
 #define SERVICE_DEPENDENCIES     L""
 
 // Default name of the account under which the service should run
-#define SERVICE_ACCOUNT          L"NT AUTHORITY\\LocalService"
+#define SERVICE_ACCOUNT          L"NT AUTHORITY\\LocalSystem"
 
 // Default password to the service account name
 #define SERVICE_PASSWORD         NULL
@@ -19,7 +19,7 @@
 #define SERVICE_CONFIG_FILE      L"config.cfg"
 
 // Command to run as a service
-#define SERVICE_CMD              L"serve"
+#define SERVICE_CMD              L"service"
 
 // Command to run as a stand-alone process
 #define PROCESS_CMD              L"run"

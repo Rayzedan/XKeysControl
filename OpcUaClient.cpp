@@ -10,18 +10,12 @@ std::map<int, int> subcribeMap;
 std::vector<std::string> config;
 DWORD timeout = 30;
 SetupDevice* device = new SetupDevice();
-ParseXml* file = new ParseXml();
+
 
 
 OpcUaClient::OpcUaClient() 
 {   
     std::cout << "Create OpcUaClient\n";
-    file->getSignalMap(signalMap);
-    file->getConfigList(config);
-    timeout = atoi(config[2].c_str());
-    device->setTimeoutDevice(timeout);
-    device->initialDevice();
-    client = UA_Client_new();
     running = true;
 }
 
@@ -33,12 +27,12 @@ OpcUaClient::~OpcUaClient()
 
 void OpcUaClient::handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* subContext, UA_UInt32 monId, void* monContext, UA_DataValue* value)
 {
-    //UA_sleep_ms(1000);   
     if (UA_Variant_hasScalarType(&value->value, &UA_TYPES[UA_TYPES_BOOLEAN])) {
         UA_Boolean error = *(UA_Boolean*)value->value.data;
         int temp = subId;
+        
         //std::cout << "MON ID - " << temp << std::endl;
-        //std::cout << "SUB ID - " << temp << std::endl;
+        //std::cout << "SUB ID - " << value->value.type << std::endl;
         int index = subcribeMap[temp];
         //for (const auto& item : subcribeMap) {
         //    std::cout << "KEY - " << item.first << " VALUE - " << item.second << std::endl;
@@ -48,11 +42,9 @@ void OpcUaClient::handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* s
             device->setLED(index, 2);
         }
         else {
-            //std::cout << "index - " << index << std::endl;
+            std::cout << "index - " << index << std::endl;
             device->setLED(index, 1);
-        }   
-       /* printf("---%-40s%-8i\n",
-            "Reading the value of node (1, \"Object.error\"):", error);*/     
+        }      
     }
 }
 
@@ -139,47 +131,59 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
     }
 }
 
-void OpcUaClient::subLoop() 
+int OpcUaClient::subLoop() 
 {
-    int requestClientTime = 5;
-    requestClientTime = atoi(config[1].c_str());
-    std::cout << "IP - " << config[0] << '\n';
-    std::cout << "TIMEOUT - " << timeout << '\n';
-    std::cout << "REQUEST CLIENT TIME - " << requestClientTime << '\n';
-    UA_Boolean value = 0;
-    UA_UInt32 reqId = 0;
-    UA_ClientConfig* cc = UA_Client_getConfig(client);
-    UA_ClientConfig_setDefault(cc);
-    /* Set stateCallback */
-    cc->stateCallback = stateCallback;
-    cc->subscriptionInactivityCallback = subscriptionInactivityCallback;
-    /* Endless loop runAsync */
-    while (running) {
-        /* if already connected, this will return GOOD and do nothing */
-        /* if the connection is closed/errored, the connection will be reset and then reconnected */
-        /* Alternatively you can also use UA_Client_getState to get the current state */
-        UA_StatusCode retval = UA_Client_connect(client, config[0].c_str());
-        if (retval != UA_STATUSCODE_GOOD) {
-            UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-                "Not connected. Retrying to connect in 5 second");           
-            /* The connect may timeout after 1 second (see above) or it may fail immediately on network errors */
-            /* E.g. name resolution errors or unreachable network. Thus there should be a small sleep here */
-            UA_sleep_ms(requestClientTime*1000);
-            continue;
-        }       
+    file = new ParseXml();
+    if (file->getConfigFile() != -1) {
+        file->getSignalMap(signalMap);
+        file->getConfigList(config);
+        timeout = atoi(config[2].c_str());
+        device->setTimeoutDevice(timeout);
+        device->initialDevice();
+        client = UA_Client_new();
+        int requestClientTime = 5;
+        requestClientTime = atoi(config[1].c_str());
+        std::cout << "IP - " << config[0] << '\n';
+        std::cout << "TIMEOUT - " << timeout << '\n';
+        std::cout << "REQUEST CLIENT TIME - " << requestClientTime << '\n';
+        UA_Boolean value = 0;
+        UA_UInt32 reqId = 0;
+        UA_ClientConfig* cc = UA_Client_getConfig(client);
+        UA_ClientConfig_setDefault(cc);
+        /* Set stateCallback */
+        cc->stateCallback = stateCallback;
+        cc->subscriptionInactivityCallback = subscriptionInactivityCallback;
+        /* Endless loop runAsync */
+        while (running) {
+            /* if already connected, this will return GOOD and do nothing */
+            /* if the connection is closed/errored, the connection will be reset and then reconnected */
+            /* Alternatively you can also use UA_Client_getState to get the current state */
+            UA_StatusCode retval = UA_Client_connect(client, config[0].c_str());
+            if (retval != UA_STATUSCODE_GOOD) {
+                UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                    "Not connected. Retrying to connect in 5 second");
+                /* The connect may timeout after 1 second (see above) or it may fail immediately on network errors */
+                /* E.g. name resolution errors or unreachable network. Thus there should be a small sleep here */
+                UA_sleep_ms(requestClientTime * 1000);
+                continue;
+            }
+
+            UA_Client_run_iterate(client, requestClientTime * 1000);
+        }
+    }
+    else {
+        return -1;
+    }
    
-
-        UA_Client_run_iterate(client, requestClientTime * 1000);
-    };
-
+    return 0;
     /* Clean up */
     UA_Client_delete(client); /* Disconnects the client internally */
 }
 
 void OpcUaClient::stopSession()
 {
-    running = false;
-    UA_Client_delete(client);
+    device->setAllRed();
+    running = false;    
     delete device;
     delete file;
 }
