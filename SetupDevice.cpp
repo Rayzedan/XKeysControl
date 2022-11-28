@@ -126,25 +126,44 @@ void callbackSetLED(int indexButton, int indexState)
 	}
 }
 
-void SetupDevice::setLED(int indexButton, int indexState)
+void SetupDevice::setLED(int indexButton, int indexState, bool isStatusGood)
 {
 	buffer[1] = 181;
 	std::cout << "INDEX BUTTON - " << indexButton << " INDEX STATE - " << indexState << std::endl;
-	if (indexState == 1) {
-		buffer[2] = indexButton + 80;
-		buffer[3] = 0;
-		result = 404;
-		while (result == 404)
-		{
-			result = WriteData(hnd, buffer);
+	if (isStatusGood) {
+		if (indexState == 1) {
+			buffer[2] = indexButton + 80;
+			buffer[3] = 0;
+			result = 404;
+			while (result == 404)
+			{
+				result = WriteData(hnd, buffer);
+			}
+			buffer[2] = indexButton;
+			buffer[3] = indexState;
+			buttonsMap[indexButton] = 1;
+			result = 404;
+			while (result == 404)
+			{
+				result = WriteData(hnd, buffer);
+			}
 		}
-		buffer[2] = indexButton;
-		buffer[3] = indexState;
-		buttonsMap[indexButton] = 1;
-		result = 404;
-		while (result == 404)
-		{
-			result = WriteData(hnd, buffer);
+		else {
+			buffer[2] = indexButton;
+			buffer[3] = 0;
+			buttonsMap[indexButton] = 0;
+			result = 404;
+			while (result == 404)
+			{
+				result = WriteData(hnd, buffer);
+			}
+			buffer[2] = indexButton + 80;
+			buffer[3] = indexState;
+			result = 404;
+			while (result == 404)
+			{
+				result = WriteData(hnd, buffer);
+			}
 		}
 	}
 	else {
@@ -157,13 +176,14 @@ void SetupDevice::setLED(int indexButton, int indexState)
 			result = WriteData(hnd, buffer);
 		}
 		buffer[2] = indexButton + 80;
-		buffer[3] = indexState;
+		buffer[3] = 1;
 		result = 404;
 		while (result == 404)
 		{
 			result = WriteData(hnd, buffer);
 		}
 	}
+	
 }
 
 DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
@@ -874,15 +894,15 @@ void SetupDevice::setAllRed()
 
 void SetupDevice::setAllBlue()
 {
-	if (buttonsMap.size() > 0) {
-		for (auto const& item : buttonsMap)
-		{
-			std::cout << "find prev value\n";
-			if (item.second == 0) {
-				setLED(item.first, 2);
-			}
-		}
-	}
+	//if (buttonsMap.size() > 0) {
+	//	for (auto const& item : buttonsMap)
+	//	{
+	//		std::cout << "find prev value\n";
+	//		if (item.second == 0) {
+	//			setLED(item.first, 2,true);
+	//		}
+	//	}
+	//}
 	buffer[1] = 179; //0xb3
 	buffer[2] = 7; //6=green, 7=red
 	buffer[3] = 0;

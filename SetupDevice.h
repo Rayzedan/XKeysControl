@@ -6,7 +6,7 @@ class SetupDevice
 public:
 	SetupDevice();
 	virtual ~SetupDevice();
-    void setLED(int indexButton, int indexState);
+    void setLED(int indexButton, int indexState, bool isStatusGood);
 	void setAllRed();
 	void setAllBlue();
 	void setTimeoutDevice(DWORD timeout);
