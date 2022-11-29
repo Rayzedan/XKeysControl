@@ -2,16 +2,26 @@
 #include <iostream>
 #include <map>
 
-BYTE buffer[80]{};
-BYTE lastpData[80];
-DWORD result;
-long hnd;
+struct buttonData
+{
+	bool isEnable;
+	int indexState;
+};
+
+
 DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error);
 DWORD __stdcall HandleErrorEvent(DWORD deviceID, DWORD status);
 void installDevice();
 void callbackSetLED(int indexButton, int indexState);
+
+
+
+BYTE buffer[80]{};
+BYTE lastpData[80];
+DWORD result;
+long hnd;
 int readlength = 0;
-std::map<int, int>buttonsMap;
+std::map<int, buttonData>buttonsMap;
 bool isDeviceEnable = false;
 DWORD timeoutDevice = 30;
 
@@ -72,8 +82,7 @@ void installDevice()
 		SuppressDuplicateReports(hnd, true);
 		DisableDataCallback(hnd, false); //turn on callback in the case it was turned off by some other command
 
-		int wlen = GetWriteLength(hnd);
-		int indexButton = 0, indexState = 0;
+		int wlen = GetWriteLength(hnd);		
 		for (int i = 0; i < wlen; i++)
 		{
 			buffer[i] = 0;
@@ -103,9 +112,58 @@ void installDevice()
 		{
 			result = WriteData(hnd, buffer);
 		}
-
 		buffer[1] = 181; //0xb5
-
+		if (buttonsMap.size() > 0) {
+			for (auto const &item:buttonsMap)
+			{
+				if (!item.second.isEnable) {
+					buffer[2] = item.first;
+					buffer[3] = 0;
+					result = 404;
+					while (result == 404)
+					{
+						result = WriteData(hnd, buffer);
+					}
+					buffer[2] = item.first + 80;
+					buffer[3] = 1;
+					result = 404;
+					while (result == 404)
+					{
+						result = WriteData(hnd, buffer);
+					}
+				} else if (item.second.indexState == 1) {
+					buffer[2] = item.first + 80;
+					buffer[3] = 0;
+					result = 404;
+					while (result == 404)
+					{
+						result = WriteData(hnd, buffer);
+					}
+					buffer[2] = item.first;
+					buffer[3] = 1;
+					result = 404;
+					while (result == 404)
+					{
+						result = WriteData(hnd, buffer);
+					}
+				} else {
+					buffer[2] = item.first;
+					buffer[3] = 0;
+					result = 404;
+					while (result == 404)
+					{
+						result = WriteData(hnd, buffer);
+					}
+					buffer[2] = item.first + 80;
+					buffer[3] = 2;
+					result = 404;
+					while (result == 404)
+					{
+						result = WriteData(hnd, buffer);
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -113,7 +171,7 @@ void callbackSetLED(int indexButton, int indexState)
 {	
 	buffer[1] = 181;	
 	if (indexState == 1 && buttonsMap.count(indexButton) != 0) {
-		if (buttonsMap[indexButton] == 0) {
+		if (buttonsMap[indexButton].indexState == 0) {
 			buffer[2] = indexButton + 80;
 			buffer[3] = 1;
 			result = 404;
@@ -130,6 +188,7 @@ void SetupDevice::setLED(int indexButton, int indexState, bool isStatusGood)
 	buffer[1] = 181;
 	std::cout << "INDEX BUTTON - " << indexButton << " INDEX STATE - " << indexState << std::endl;
 	if (isStatusGood) {
+		buttonsMap[indexButton].isEnable = true;
 		if (indexState == 1) {
 			buffer[2] = indexButton + 80;
 			buffer[3] = 0;
@@ -140,7 +199,7 @@ void SetupDevice::setLED(int indexButton, int indexState, bool isStatusGood)
 			}
 			buffer[2] = indexButton;
 			buffer[3] = indexState;
-			buttonsMap[indexButton] = 1;
+			buttonsMap[indexButton].indexState = 1;
 			result = 404;
 			while (result == 404)
 			{
@@ -150,7 +209,7 @@ void SetupDevice::setLED(int indexButton, int indexState, bool isStatusGood)
 		else {
 			buffer[2] = indexButton;
 			buffer[3] = 0;
-			buttonsMap[indexButton] = 0;
+			buttonsMap[indexButton].indexState = 0;
 			result = 404;
 			while (result == 404)
 			{
@@ -166,9 +225,10 @@ void SetupDevice::setLED(int indexButton, int indexState, bool isStatusGood)
 		}
 	}
 	else {
+		buttonsMap[indexButton].isEnable = false;
 		buffer[2] = indexButton;
 		buffer[3] = 0;
-		buttonsMap[indexButton] = 0;
+		buttonsMap[indexButton].indexState = 0;
 		result = 404;
 		while (result == 404)
 		{
