@@ -105,8 +105,7 @@ void installDevice()
 		}
 
 		buffer[1] = 181; //0xb5
-		//get key index
-		//get text box text
+
 	}
 }
 
