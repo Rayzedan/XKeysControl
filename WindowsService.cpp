@@ -87,7 +87,7 @@ void CSampleService::OnStart(DWORD /* useleses */, PWSTR* /* useless */)
     }
     else
     {
-        wprintf(L"Astra.XKeysDriver is running as a regular process.\n");
+        std::cout << "Astra.XKeysDriver is running as a regular process.\n";
 
         CSampleService::ServiceRunner(this);
     }
@@ -105,7 +105,7 @@ void CSampleService::Run()
 DWORD __stdcall CSampleService::ServiceRunner(void* self)
 {
     CSampleService* pService = (CSampleService*)self;
-
+    std::cout << "Astra.XKeysDriver has started.\n";
     pService->WriteLogEntry(L"Astra.XKeysDriver has started.", EVENTLOG_INFORMATION_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
 
     // Periodically check if the service is stopping.
@@ -114,15 +114,34 @@ DWORD __stdcall CSampleService::ServiceRunner(void* self)
         if (once)
         {
             // Log multi-line message
+            std::cout << "Astra.XKeysDrivere is working:\n";
             pService->WriteLogEntry(L"Astra.XKeysDrivere is working:\n", EVENTLOG_INFORMATION_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
-            if (worker->subLoop() == -1)
-                pService->WriteLogEntry(L"Astra.XKeysDrivere can`t read xml-map",EVENTLOG_ERROR_TYPE,MSG_OPERATION, CATEGORY_SERVICE);
+            worker->initialRequest();         
         }
- 
+        switch (worker->getCurrentState())
+        {
+        case -1:
+            std::cout << "Невозможно прочитать конфигурационный файл\n";
+            pService->WriteLogEntry(L"Невозможно прочитать конфигурационный файл", EVENTLOG_ERROR_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
+            break;
+        case 0:
+            std::cout << "Служба работает в штатном режиме\n";
+            pService->WriteLogEntry(L"Служба работает в штатном режиме", EVENTLOG_ERROR_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
+            break;
+        case 1:
+            std::cout << "Модуль клиента не отвечает\n";
+            pService->WriteLogEntry(L"Модуль клиента не отвечает", EVENTLOG_ERROR_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
+            break;
+        default:
+            std::cout << "Неизвестная ошибка\n";
+            pService->WriteLogEntry(L"Неизвестная ошибка", EVENTLOG_ERROR_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
+            break;
+        }
         // Just pretend to do some work
         //Sleep(5000);
     }
 
+    std::cout << "Astra.XKeysDriver has stopped.\n";
     // Signal the stopped event.
     SetEvent(pService->m_hHasStoppedEvent);
     pService->WriteLogEntry(L"Astra.XKeysDriver has stopped.", EVENTLOG_INFORMATION_TYPE, MSG_SHUTDOWN, CATEGORY_SERVICE);
@@ -132,6 +151,7 @@ DWORD __stdcall CSampleService::ServiceRunner(void* self)
 
 void CSampleService::OnStop()
 {
+    std::cout << "Stop session...\n";
     // Log a service stop message to the Application log.
     WriteLogEntry(L"Astra.XKeysDriver is stopping", EVENTLOG_INFORMATION_TYPE, MSG_SHUTDOWN, CATEGORY_SERVICE);
     // Indicate that the service is stopping and wait for the finish of the

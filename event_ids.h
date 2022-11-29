@@ -52,7 +52,7 @@
 //
 // MessageText:
 //
-// Startup
+// Служба запускается...
 //
 #define MSG_STARTUP                      ((DWORD)0x4000000AL)
 
@@ -61,7 +61,7 @@
 //
 // MessageText:
 //
-// Running
+// Служба успешно работает...
 //
 #define MSG_OPERATION                    ((DWORD)0x4000000BL)
 
@@ -70,7 +70,7 @@
 //
 // MessageText:
 //
-// Shutdown
+// Служба отключается...
 //
 #define MSG_SHUTDOWN                     ((DWORD)0x4000000CL)
 
@@ -79,7 +79,7 @@
 //
 // MessageText:
 //
-// Service Failure
+// Служба отключена из-за ошибки...
 //
 #define MSG_SVC_FAILURE                  ((DWORD)0xC000000DL)
 

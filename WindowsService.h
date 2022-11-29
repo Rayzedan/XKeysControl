@@ -49,7 +49,7 @@ class CSampleService: public CServiceBase
 
     virtual void OnStop();
 
-    static DWORD __stdcall  ServiceRunner(void* self);
+    static DWORD __stdcall ServiceRunner(void* self);
 
     void Run();
 

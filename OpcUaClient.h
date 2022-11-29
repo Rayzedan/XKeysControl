@@ -14,9 +14,13 @@ class OpcUaClient
 public:
 	OpcUaClient();
 	virtual ~OpcUaClient();
-	int subLoop();
+	int getCurrentState();
+	void initialRequest();
 	void stopSession();
 private:
+	bool infiniteRequest();
+	int requestClientTime = 5;
+	int threadState;
 	ParseXml* file;
 	UA_Client* client;
 	static void handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* subContext,
