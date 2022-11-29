@@ -1,9 +1,11 @@
 #include "OpcUaClient.h"
+#include "SetupDevice.h"
+#include "ParseXml.h"
 #include <iostream>
 #include <vector>
 #include <map>
-#include "SetupDevice.h"
-#include "ParseXml.h"
+#include <string>
+
 
 UA_Boolean running;
 struct signalNode
@@ -12,7 +14,6 @@ struct signalNode
     UA_NodeId node;
     bool isSignalGood;
 };
-
 std::map<int, std::pair<std::string, int>> signalMap;
 std::map<int, signalNode> subcribeMap;
 std::vector<std::string> config;
@@ -34,13 +35,11 @@ OpcUaClient::~OpcUaClient()
 
 void OpcUaClient::handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* subContext, UA_UInt32 monId, void* monContext, UA_DataValue* value)
 {
-    if (UA_Variant_hasScalarType(&value->value, &UA_TYPES[UA_TYPES_BOOLEAN])) 
-    {
-        std::cout << "status code - " << value->status << std::endl;
+    if (UA_Variant_hasScalarType(&value->value, &UA_TYPES[UA_TYPES_BOOLEAN])) {
         unsigned int status = value->status;
         int key = subId;
         int index = subcribeMap[key].indexButton;
-        if (status != 2150760448)
+        if (status != 2150760448 || status == 0)
             subcribeMap[key].isSignalGood = true;
         else
             subcribeMap[key].isSignalGood = false;
@@ -177,34 +176,16 @@ int OpcUaClient::subLoop()
                 std::cout << "Not connected. Retrying to connect in " << requestClientTime << " second\n";
                 UA_sleep_ms(requestClientTime * 1000);
                 continue;
-            }            
-            //for (std::map<int, signalNode>::iterator a = subcribeMap.begin(); a != subcribeMap.end(); a++)
-            //{
-            //    UA_SessionState state;
-            //    UA_Variant status;
-            //    UA_Variant_init(&status);
-            //    UA_StatusCode retval;
-            //    UA_Client_getState(client, NULL, &state, NULL);
-            //    if (state == UA_SESSIONSTATE_ACTIVATED) {
-            //        retval = UA_Client_readValueAttribute_async(client,
-            //            a->second.node,
-            //            readValueAttributeCallback, NULL,
-            //            &reqId);
-            //    }
-            //    UA_Variant_clear(&status);
-            //    bool isEnable = UA_StatusCode_isGood(retval);
-            //    a->second.isSignalGood = isEnable;
-            //    //std::cout  << "signal is good - " << isEnable << std::endl;
-            //}            
+            }                  
             UA_Client_run_iterate(client, requestClientTime * 1000);
         }
     }
-    else {
+    else 
         return -1;
-    }
    
     /* Clean up */
-    UA_Client_delete(client); /* Disconnects the client internally */
+    /* Disconnects the client internally */
+    UA_Client_delete(client); 
 }
 
 void OpcUaClient::stopSession()

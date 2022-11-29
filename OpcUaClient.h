@@ -5,7 +5,6 @@
 #include <open62541/client_config_default.h>
 #include <open62541/client_subscriptions.h>
 #include <open62541/plugin/log_stdout.h>
-#include <string>
 #include "ParseXml.h"
 #include <stdlib.h>
 #pragma comment(lib, "Ws2_32.lib")
