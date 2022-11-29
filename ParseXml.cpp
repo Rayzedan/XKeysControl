@@ -1,6 +1,7 @@
 #include "ParseXml.h"
 #include <Windows.h>
 #include <algorithm>
+#include <iostream>
 
 ParseXml::ParseXml() 
 {
@@ -13,8 +14,14 @@ ParseXml::~ParseXml()
 
 void ParseXml::getSignalMap(std::map<int, std::pair<std::string, int>>& temp)
 {
-    if (signals.size() > 0)
+    if (signals.size() > 0) {
         temp = signals;
+        std::cout << "get map\n";
+    }
+    else {
+        std::cout << "map is empty\n";
+    }
+        
 
 }
 
@@ -87,6 +94,10 @@ int ParseXml::getConfigFile()
                 config.push_back(attr.value());
             }
         }
+        if (signals.size() > 0)
+            std::cout << "finished reading signal map from xml-file\n";
+        else
+            std::cout << "finished reading signal map from xml-file\n";
         return 0;
     }
     else {

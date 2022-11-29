@@ -11,7 +11,7 @@ public:
 	void setAllBlue();
 	void setTimeoutDevice(DWORD timeout);
 	void initialDevice();
+	bool getCurrentState();
 private:
-
 };
 

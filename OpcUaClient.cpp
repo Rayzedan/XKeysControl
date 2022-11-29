@@ -25,7 +25,7 @@ SetupDevice* device = new SetupDevice();
 OpcUaClient::OpcUaClient() 
 {   
     std::cout << "Create OpcUaClient\n";
-    running = true;
+    running = false;
 }
 
 OpcUaClient::~OpcUaClient() 
@@ -95,9 +95,16 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
     case UA_SESSIONSTATE_ACTIVATED: {
         UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "A session with the server is activated");
         device->setAllBlue();
+        if (signalMap.size() > 0) {
+            std::cout << "start reading signal map...\n";
+        }
+        else {
+            std::cout << "signal map is empty\n";
+        }
         /* A new session was created. We need to create the subscription. */
         /* Create a subscription */
         for (const auto& item : signalMap) {
+
             /* Add a MonitoredItem */
             if (item.second.second) {
                 UA_CreateSubscriptionRequest request = UA_CreateSubscriptionRequest_default();
@@ -145,53 +152,84 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
     }
 }
 
-int OpcUaClient::subLoop() 
+void OpcUaClient::initialRequest() 
 {
     file = new ParseXml();
     if (file->getConfigFile() != -1) {
+        running = true;
         file->getSignalMap(signalMap);
         file->getConfigList(config);
         timeout = atoi(config[2].c_str());
         device->setTimeoutDevice(timeout);
-        device->initialDevice();
-        client = UA_Client_new();
-        int requestClientTime = 5;
         requestClientTime = atoi(config[1].c_str());
         std::cout << "Device timeout - " << timeout << std::endl;
         std::cout << "Request client time - " << requestClientTime << std::endl;
-        UA_Boolean value = 0;
-        UA_UInt32 reqId = 0;
+        device->initialDevice();
+        client = UA_Client_new();
         UA_ClientConfig* cc = UA_Client_getConfig(client);
         UA_ClientConfig_setDefault(cc);
         /* Set stateCallback */
         cc->stateCallback = stateCallback;
         cc->subscriptionInactivityCallback = subscriptionInactivityCallback;
-        /* Endless loop runAsync */
-        while (running) {
-            /* if already connected, this will return GOOD and do nothing */
-            /* if the connection is closed/errored, the connection will be reset and then reconnected */
-            /* Alternatively you can also use UA_Client_getState to get the current state */
-            UA_StatusCode retval = UA_Client_connect(client, config[0].c_str());
-            if (retval != UA_STATUSCODE_GOOD) {
-                std::cout << "Not connected. Retrying to connect in " << requestClientTime << " second\n";
-                UA_sleep_ms(requestClientTime * 1000);
-                continue;
-            }                  
-            UA_Client_run_iterate(client, requestClientTime * 1000);
+        while (!infiniteRequest()) {
+            infiniteRequest();
         }
     }
-    else 
-        return -1;
+    else {
+        std::cout << "can`t read configuration file\n";
+        threadState = -1;
+    }
    
     /* Clean up */
     /* Disconnects the client internally */
-    UA_Client_delete(client); 
+    std::cout << "Delete client\n";
+    UA_Client_disconnect(client);
+    threadState = 1;
+}
+
+int OpcUaClient::getCurrentState()
+{
+    return threadState;
 }
 
 void OpcUaClient::stopSession()
 {
     device->setAllRed();
     running = false;    
+    UA_Client_delete(client);
     delete device;
     delete file;
+}
+
+bool OpcUaClient::infiniteRequest()
+{
+    /* Endless loop runAsync */
+    while (!device->getCurrentState()) {
+        UA_sleep_ms(timeout * 1000);
+        running = false;
+        std::cout << "trying to connect to device...\n";
+    }
+    if (device->getCurrentState()) {
+        running = true;
+        std::cout << "start async request\n";
+    }
+
+    while (running) {
+        /* if already connected, this will return GOOD and do nothing */
+        /* if the connection is closed/errored, the connection will be reset and then reconnected */
+        /* Alternatively you can also use UA_Client_getState to get the current state */
+        UA_StatusCode retval = UA_Client_connect(client, config[0].c_str());
+        bool deviceIndicator = device->getCurrentState();
+        if (retval != UA_STATUSCODE_GOOD || !deviceIndicator) {
+            if (!deviceIndicator)
+                UA_Client_disconnect(client);
+            std::cout << "Not connected. Retrying to connect in " << requestClientTime << " second...\n";
+            UA_sleep_ms(requestClientTime * 1000);
+            continue;
+        }
+        threadState = 0;
+        UA_Client_run_iterate(client, requestClientTime * 1000);
+    }
+    std::cout << "exit from loop\n";
+    return false;
 }
