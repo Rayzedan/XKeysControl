@@ -9,19 +9,12 @@ struct buttonData
 };
 
 
-DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error);
-//DWORD __stdcall HandleErrorEvent(DWORD deviceID, DWORD status);
-void __stdcall installDevice();
-void callbackSetLED(int indexButton, int indexState);
+static char dataStr2[256];
+static BYTE buffer[80];
+static BYTE lastpData[80];
+static long hnd;
 
-
-char dataStr2[256]{};
-BYTE buffer[80]{};
-BYTE lastpData[80]{};
-DWORD result;
-long hnd;
-int readlength = 0;
-std::map<int, buttonData>buttonsMap;
+static std::map<int, buttonData>buttonsMap;
 bool isDeviceEnable = false;
 DWORD timeoutDevice = 30;
 
@@ -44,25 +37,55 @@ bool SetupDevice::getCurrentState()
 {
 	if (isDeviceEnable)
 		return true;
-	else
+	else {
 		return false;
+		Sleep(timeoutDevice * 1000);
+		installDevice();
+	}		
 }
 
-void __stdcall installDevice()
+void SetupDevice::writeDeviceData(int indexButton, int indexState)
+{
+	//std::cout << "write device data\n";
+	DWORD result = 0;
+	int wlen = GetWriteLength(hnd);
+	for (int i = 0; i < wlen; ++i)
+	{
+		buffer[i] = 0;
+	}
+	buffer[1] = 181;
+	buffer[2] = indexButton;
+	buffer[3] = indexState;
+	result = 404;
+	while (result == 404)
+	{
+		result = WriteData(hnd, buffer);
+	}
+}
+
+void SetupDevice::installDevice()
 {
 	std::cout << "setup device...\n";
-	TEnumHIDInfo info[10];
-	result = 0;
+	TEnumHIDInfo info[128];
+	DWORD result = 0;
 	hnd = 0;
 	long count = 0;
-	int pid;
+	int pid = 0;
 	result = EnumeratePIE(0x5F3, info, count);	
-	while (result!=0)
+	if (result != 0)
 	{
+		if (result == 102) {
+			//std::cout << "No PI Engineering Devices Found\n";
+		}
+		else {
+			std::cout << "Error finding PI Engineering Devices\n";
+		}
+	}
+	else if (count == 0) {		
 		Sleep(timeoutDevice * 1000);
-		isDeviceEnable = false;
+		std::cout << "No PI Engineering Devices Found\n";
+		std::cout << "Trying to find a device...\n";
 		result = EnumeratePIE(0x5F3, info, count);
-		std::cout << "Error setting up PI Engineering Device\n";
 	}
 	for (long i = 0; i < count; ++i) {
 		pid = info[i].PID; //get the device pid		
@@ -82,7 +105,7 @@ void __stdcall installDevice()
 		std::cout << "trying setup device to default...\n";
 		//Turn on the data callback
 		result = SetDataCallback(hnd, HandleDataEvent);
-		//result = SetErrorCallback(hnd, HandleErrorEvent);
+		result = SetErrorCallback(hnd, HandleErrorEvent);
 		SuppressDuplicateReports(hnd, true);
 		DisableDataCallback(hnd, false); //turn on callback in the case it was turned off by some other command
 
@@ -129,140 +152,63 @@ void __stdcall installDevice()
 			for (auto const &item:buttonsMap)
 			{
 				if (!item.second.isEnable) {
-					buffer[2] = item.first;
-					buffer[3] = 0;
-					result = 404;
-					while (result == 404)
-					{
-						result = WriteData(hnd, buffer);
-					}
-					buffer[2] = item.first + 80;
-					buffer[3] = 1;
-					result = 404;
-					while (result == 404)
-					{
-						result = WriteData(hnd, buffer);
-					}
+					writeDeviceData(item.first, 0);
+					writeDeviceData(item.first + 80, 1);
 				} else if (item.second.indexState == 1) {
-					buffer[2] = item.first + 80;
-					buffer[3] = 0;
-					result = 404;
-					while (result == 404)
-					{
-						result = WriteData(hnd, buffer);
-					}
-					buffer[2] = item.first;
-					buffer[3] = 1;
-					result = 404;
-					while (result == 404)
-					{
-						result = WriteData(hnd, buffer);
-					}
+					writeDeviceData(item.first + 80, 0);
+					writeDeviceData(item.first , 1);
 				} else {
-					buffer[2] = item.first;
-					buffer[3] = 0;
-					result = 404;
-					while (result == 404)
-					{
-						result = WriteData(hnd, buffer);
-					}
-					buffer[2] = item.first + 80;
-					buffer[3] = 2;
-					result = 404;
-					while (result == 404)
-					{
-						result = WriteData(hnd, buffer);
-					}
+					writeDeviceData(item.first, 0);
+					writeDeviceData(item.first + 80, 2);
 				}
 			}
 		}
 	}
 }
 
-void callbackSetLED(int indexButton, int indexState)
+void SetupDevice::callbackSetLED(int indexButton, int indexState)
 {
-	//std::cout << "callback set led was used\n";
+	DWORD result = 0;
+	std::cout << "callback set led was used\n";
 	buffer[1] = 181;	
 	if (indexState == 1 && buttonsMap.count(indexButton) != 0) {
 		if (buttonsMap[indexButton].indexState == 0) {
-			buffer[2] = indexButton + 80;
-			buffer[3] = 1;
-			result = 404;
-			while (result == 404)
-			{
-				result = WriteData(hnd, buffer);
-			}
+			writeDeviceData(indexButton + 80, 1);
 		}
 	}
 }
 
 void SetupDevice::setLED(int indexButton, int indexState, bool isStatusGood)
 {
+	DWORD result = 0;
 	buffer[1] = 181;
 	std::cout << "INDEX BUTTON - " << indexButton << " INDEX STATE - " << indexState << std::endl;
 	if (isStatusGood) {
 		buttonsMap[indexButton].isEnable = true;
 		if (indexState == 1) {
-			buffer[2] = indexButton + 80;
-			buffer[3] = 0;
-			result = 404;
-			while (result == 404)
-			{
-				result = WriteData(hnd, buffer);
-			}
-			buffer[2] = indexButton;
-			buffer[3] = indexState;
+			writeDeviceData(indexButton + 80, 0);
+			writeDeviceData(indexButton, indexState);
 			buttonsMap[indexButton].indexState = 1;
-			result = 404;
-			while (result == 404)
-			{
-				result = WriteData(hnd, buffer);
-			}
 		}
 		else {
-			buffer[2] = indexButton;
-			buffer[3] = 0;
 			buttonsMap[indexButton].indexState = 0;
-			result = 404;
-			while (result == 404)
-			{
-				result = WriteData(hnd, buffer);
-			}
-			buffer[2] = indexButton + 80;
-			buffer[3] = indexState;
-			result = 404;
-			while (result == 404)
-			{
-				result = WriteData(hnd, buffer);
-			}
+			writeDeviceData(indexButton, 0);
+			writeDeviceData(indexButton + 80, indexState);
 		}
 	}
 	else {
+		writeDeviceData(indexButton,0);
+		writeDeviceData(indexButton + 80, 1);
 		buttonsMap[indexButton].isEnable = false;
-		buffer[2] = indexButton;
-		buffer[3] = 0;
 		buttonsMap[indexButton].indexState = 0;
-		result = 404;
-		while (result == 404)
-		{
-			result = WriteData(hnd, buffer);
-		}
-		buffer[2] = indexButton + 80;
-		buffer[3] = 1;
-		result = 404;
-		while (result == 404)
-		{
-			result = WriteData(hnd, buffer);
-		}
 	}
 	
 }
 
-DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
+DWORD SetupDevice::HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 {	
 	int d = _itoa_s(pData[1], dataStr2, 10);
-	std::cout << "access - " << d << std::endl;
-	//Buttons
+	int readlength = 0;
 	int maxcols = 10;
 	int maxrows = 8;
 	for (int i = 0; i < maxcols; i++) //loop for each column of button data (Max Cols)
@@ -275,616 +221,9 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 			int state = 0; //0=was up and is up, 1=was up and is down, 2= was down and is down, 3=was down and is up 
 			if (((pData[i + 3] & temp1) != 0) && ((lastpData[i + 3] & temp1) == 0))
 				state = 1;
-			else if (((pData[i + 3] & temp1) != 0) && ((lastpData[i + 3] & temp1) != 0))
-				state = 2;
-			else if (((pData[i + 3] & temp1) == 0) && ((lastpData[i + 3] & temp1) != 0))
-				state = 3;
-
-			//Perform action based on key number, consult P.I. Engineering SDK documentation for the key numbers
-			switch (keynum)
-			{
-			case 0: //button 0 (top left)
-				if (state == 1) //key was pressed
-				{					
-					callbackSetLED(keynum, 1);
-				}
-				break;
-			case 1: //button 1
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				break;
-			case 3: //button 3
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				break;
-			case 4: //button 4
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				break;
-			case 5: //button 5
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-
-			case 6: //button 6
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 7: //button 7 
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-				//Next column of buttons
-			case 8: //button 8
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 9: //button 9
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 11: //button 11
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-
-			case 12: //button 12
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 13: //button 13
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-
-			case 14: //button 14
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 15: //button 15
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-				//Next column of buttons
-			case 16: //button 16
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 17: //button 17
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 24: //button 24
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 25: //button 25
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 27: //button 27
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-
-			case 28: //button 28
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 29: //button 29
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-
-			case 30: //button 30
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 31: //button 31
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-				//Next column of buttons
-			case 32: //button 32
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 33: //button 33
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 35: //button 35
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-				//Next column of buttons                             
-			case 36: //button 36
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 37: //button 37
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-
-			case 38: //button 38
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 39: //button 39
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-				//Next column of buttons  
-			case 40: //button 40
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 41: //button 41
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 43: //button 43
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-
-			case 44: //button 44
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-
-			case 45: //button 45
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-
-			case 46: //button 46
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 47: //button 47
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-				//Next column of buttons		     
-			case 48: //button 48
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 49: //button 49
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 51: //button 51
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 52: //button 52
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 53: //button 53
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 54: //button 54
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 55: //button 55
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-				//Next column of buttons
-			case 56: //button 56
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 57: //button 57
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 64: //button 57
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 65: //button 57
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 67: //button 57
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 68: //button 57
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 69: //button 57
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 70: //button 57
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 71: //button 57
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 72: //button 57
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 73: //button 57
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 75: //button 57
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 76: //button 57
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 77: //button 57
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 78:
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;
-			case 79: //button 60
-				if (state == 1) //key was pressed
-				{
-					callbackSetLED(keynum, 1);
-				}
-				else if (state == 3) //key was released
-				{
-					//do release action
-				}
-				break;		
-			}
-
+			
+			if (state == 1)
+				callbackSetLED(keynum, 1);
 		}
 	}
 
@@ -899,25 +238,25 @@ DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 	{
 		DisableDataCallback(hnd, true);
 		CleanupInterface(hnd);
-		CloseInterface(hnd);
+		//CloseInterface(hnd);
 		MessageBeep(MB_ICONHAND);
 		std::cout << "Device disconnected\n";
 		isDeviceEnable = false;
 		while (!isDeviceEnable)
 		{
 			Sleep(timeoutDevice*1000);
-			installDevice();
+			SetupDevice::installDevice();
 		}
 	}
 	return TRUE;
 }
 
-//DWORD __stdcall HandleErrorEvent(DWORD deviceID, DWORD status)
-//{
-//	MessageBeep(MB_ICONHAND);
-//	std::cout << "Error from error callback\n";
-//	return TRUE;
-//}
+DWORD SetupDevice::HandleErrorEvent(DWORD deviceID, DWORD status)
+{
+	MessageBeep(MB_ICONHAND);
+	std::cout << "Error from error callback\n";
+	return TRUE;
+}
 
 void SetupDevice::setTimeoutDevice(DWORD timeout)
 {
@@ -926,6 +265,7 @@ void SetupDevice::setTimeoutDevice(DWORD timeout)
 
 void SetupDevice::setAllRed()
 {
+	DWORD result = 0;
 	buffer[1] = 179; //0xb3
 	buffer[2] = 6; //6=green, 7=red
 	buffer[3] = 0;
@@ -966,6 +306,7 @@ void SetupDevice::setAllRed()
 
 void SetupDevice::setAllBlue()
 {
+	DWORD result = 0;
 	buffer[1] = 179; //0xb3
 	buffer[2] = 7; //6=green, 7=red
 	buffer[3] = 0;

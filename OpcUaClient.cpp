@@ -218,8 +218,13 @@ bool OpcUaClient::infiniteRequest()
         /* if already connected, this will return GOOD and do nothing */
         /* if the connection is closed/errored, the connection will be reset and then reconnected */
         /* Alternatively you can also use UA_Client_getState to get the current state */
-        UA_StatusCode retval = UA_Client_connect(client, config[0].c_str());
         bool deviceIndicator = device->getCurrentState();
+        UA_StatusCode retval = UA_STATUSCODE_BAD;
+        if (deviceIndicator)
+            retval = UA_Client_connect(client, config[0].c_str());
+        else
+            retval = UA_STATUSCODE_BAD;
+
         if (retval != UA_STATUSCODE_GOOD || !deviceIndicator) {
             if (!deviceIndicator)
                 UA_Client_disconnect(client);
