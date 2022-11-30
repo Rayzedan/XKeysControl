@@ -165,7 +165,6 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="default1.bin" />
     <None Include="event_ids.mc" />
     <None Include="MSG00409.bin" />
   </ItemGroup>

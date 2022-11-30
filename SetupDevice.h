@@ -13,5 +13,11 @@ public:
 	void initialDevice();
 	bool getCurrentState();
 private:
+	static void writeDeviceData(int indexButton, int indexState);
+	static DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error);
+	static DWORD __stdcall HandleErrorEvent(DWORD deviceID, DWORD status);
+	static void __stdcall installDevice();
+	static void __stdcall callbackSetLED(int indexButton, int indexState);
+
 };
 
