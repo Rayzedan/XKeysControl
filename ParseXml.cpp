@@ -14,21 +14,21 @@ ParseXml::~ParseXml()
 
 void ParseXml::getSignalMap(std::map<int, std::pair<std::string, int>>& temp)
 {
-    if (signals.size() > 0) {
-        temp = signals;       
+    if (m_signals.size() > 0) {
+        temp = m_signals;       
     }   
 }
 
 void ParseXml::getConfigList(std::vector<std::string> &temp)
 {
-    if (config.size() > 0) {
-        temp = config;
+    if (m_config.size() > 0) {
+        temp = m_config;
     }
     else {
-        config.push_back("opc.tcp://localhost:62544");
-        config.push_back("5");
-        config.push_back("30");
-        temp = config;
+        m_config.push_back("opc.tcp://localhost:62544");
+        m_config.push_back("5");
+        m_config.push_back("30");
+        temp = m_config;
     }
 }
 
@@ -67,8 +67,8 @@ int ParseXml::getConfigFile()
                     key = convertIndexButton(atoi(attr.value()));
                 }
             }
-            signals[key].first = signalPath;
-            signals[key].second = enableOpc;
+            m_signals[key].first = signalPath;
+            m_signals[key].second = enableOpc;
         }
         tools = doc.child("configuration").child("OpcServer");
         for (pugi::xml_node tool = tools.first_child(); tool; tool = tool.next_sibling())
@@ -76,7 +76,7 @@ int ParseXml::getConfigFile()
             for (pugi::xml_attribute attr = tool.first_attribute(); attr; attr = attr.next_attribute())
             {
                 std::string name = attr.name();
-                config.push_back(attr.value());
+                m_config.push_back(attr.value());
             }
         }
         tools = doc.child("configuration");
@@ -85,7 +85,7 @@ int ParseXml::getConfigFile()
             int i = 0;
             for (pugi::xml_attribute attr = tool.first_attribute(); attr; attr = attr.next_attribute())
             {
-                config.push_back(attr.value());
+                m_config.push_back(attr.value());
             }
         }
         return 0;

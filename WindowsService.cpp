@@ -106,7 +106,7 @@ void CSampleService::Run()
 DWORD __stdcall CSampleService::ServiceRunner(void* self)
 {
     CSampleService* pService = (CSampleService*)self;
-    std::cout << "Astra.XKeysDriver has started.\n";
+    //std::cout << "Astra.XKeysDriver has started.\n";
     pService->WriteLogEntry(L"Astra.XKeysDriver has started.", EVENTLOG_INFORMATION_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
 
     // Periodically check if the service is stopping.
@@ -115,24 +115,24 @@ DWORD __stdcall CSampleService::ServiceRunner(void* self)
         if (once)
         {
             // Log multi-line message
-            std::cout << "Astra.XKeysDrivere is working:\n";
+            //std::cout << "Astra.XKeysDrivere is working:\n";
             pService->WriteLogEntry(L"Astra.XKeysDrivere is working:\n", EVENTLOG_INFORMATION_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
             switch (worker->getCurrentState())
             {
             case -1:
-                std::cout << "Невозможно прочитать конфигурационный файл\n";
+                //std::cout << "Невозможно прочитать конфигурационный файл\n";
                 pService->WriteLogEntry(L"Невозможно прочитать конфигурационный файл", EVENTLOG_ERROR_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
                 break;
             case 0:
-                std::cout << "Служба работает в штатном режиме\n";
+                //std::cout << "Служба работает в штатном режиме\n";
                 pService->WriteLogEntry(L"Служба работает в штатном режиме", EVENTLOG_ERROR_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
                 break;
             case 1:
-                std::cout << "Модуль клиента не отвечает\n";
+                //std::cout << "Модуль клиента не отвечает\n";
                 pService->WriteLogEntry(L"Модуль клиента не отвечает", EVENTLOG_ERROR_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
                 break;
             default:
-                std::cout << "Неизвестная ошибка\n";
+                //std::cout << "Неизвестная ошибка\n";
                 pService->WriteLogEntry(L"Неизвестная ошибка", EVENTLOG_ERROR_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
                 break;
             }
