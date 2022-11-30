@@ -24,7 +24,7 @@
     <ProjectGuid>{236426B6-B67F-48A4-ADDF-D5D46BEFC484}</ProjectGuid>
     <RootNamespace>XKeyboardConsole</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Astra.XKeysDriver</ProjectName>
+    <ProjectName>Astra.Keyboard</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
