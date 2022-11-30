@@ -5,7 +5,6 @@
 #include "WindowsService.h"
 #include <ServiceInstaller.h>
 #include <Windows.h>
-#include "OpcUaClient.h"
 using namespace std;
 
 int wmain(int argc, wchar_t* argv[])
@@ -19,156 +18,150 @@ int wmain(int argc, wchar_t* argv[])
     WCHAR wsServiceParams[MAX_PATH] = SERVICE_CMD;
     CSampleService service(SERVICE_NAME);
 
-    OpcUaClient* client = new OpcUaClient();
-    client->initialRequest();
+    if (argc > 1)
+    {
+        if (_wcsicmp(L"install", argv[1]) == 0)
+        {
+            try
+            {
+                for (int i = 2; i < argc; i++)
+                {
+                    PWSTR arg = argv[i];
 
-    //service.SetCommandLine(argc, argv);
+                    if (arg[0] == '-')
+                    {
+                        if (_wcsicmp(L"-start-type", arg) == 0)
+                        {
+                            if (argc > i)
+                            {
+                                PCWSTR wsStartType = argv[++i];
 
-    //service.Run();
-    //if (argc > 1)
-    //{
-    //    if (_wcsicmp(L"install", argv[1]) == 0)
-    //    {
-    //        try
-    //        {
-    //            for (int i = 2; i < argc; i++)
-    //            {
-    //                PWSTR arg = argv[i];
+                                if (regex_match(wsStartType, wregex(L"[2-4]")))
+                                {
+                                    dwSvcStartType = _wtol(wsStartType);
+                                }
+                                else
+                                {
+                                    throw exception("выберите режим установки службы (2-4)");
+                                }
+                            }
+                            else
+                            {
+                                throw exception("не выбран режим установки");
+                            }
+                        }
+                        else if (_wcsicmp(L"-account", arg) == 0)
+                        {
+                            if (argc > i)
+                            {
+                                wsSvcAccount = argv[++i];
+                            }
+                            else
+                            {
+                                throw exception("no account name after -account");
+                            }
+                        }
+                        else if (_wcsicmp(L"-password", arg) == 0)
+                        {
+                            if (argc > i)
+                            {
+                                wsSvcPwd = argv[++i];
+                            }
+                            else
+                            {
+                                throw exception("no password  after -password");
+                            }
+                        }
+                        else if (_wcsicmp(L"-config", arg) == 0)
+                        {
+                            if (argc > i)
+                            {
+                                _snwprintf_s(wsServiceParams, _countof(wsServiceParams), _TRUNCATE, L"%s -config \"%s\"", SERVICE_CMD, argv[++i]);
+                            }
+                            else
+                            {
+                                throw exception("no configuration file specified");
+                            }
+                        }
+                        else
+                        {
+                            char errMsg[MAX_PATH];
+                            _snprintf_s(errMsg, _countof(errMsg), _TRUNCATE, "unknown parameter: %S", arg);
 
-    //                if (arg[0] == '-')
-    //                {
-    //                    if (_wcsicmp(L"-start-type", arg) == 0)
-    //                    {
-    //                        if (argc > i)
-    //                        {
-    //                            PCWSTR wsStartType = argv[++i];
+                            throw exception(errMsg);
+                        }
+                    }
+                }
 
-    //                            if (regex_match(wsStartType, wregex(L"[2-4]")))
-    //                            {
-    //                                dwSvcStartType = _wtol(wsStartType);
-    //                            }
-    //                            else
-    //                            {
-    //                                throw exception("выберите режим установки службы (2-4)");
-    //                            }
-    //                        }
-    //                        else
-    //                        {
-    //                            throw exception("не выбран режим установки");
-    //                        }
-    //                    }
-    //                    else if (_wcsicmp(L"-account", arg) == 0)
-    //                    {
-    //                        if (argc > i)
-    //                        {
-    //                            wsSvcAccount = argv[++i];
-    //                        }
-    //                        else
-    //                        {
-    //                            throw exception("no account name after -account");
-    //                        }
-    //                    }
-    //                    else if (_wcsicmp(L"-password", arg) == 0)
-    //                    {
-    //                        if (argc > i)
-    //                        {
-    //                            wsSvcPwd = argv[++i];
-    //                        }
-    //                        else
-    //                        {
-    //                            throw exception("no password  after -password");
-    //                        }
-    //                    }
-    //                    else if (_wcsicmp(L"-config", arg) == 0)
-    //                    {
-    //                        if (argc > i)
-    //                        {
-    //                            _snwprintf_s(wsServiceParams, _countof(wsServiceParams), _TRUNCATE, L"%s -config \"%s\"", SERVICE_CMD, argv[++i]);
-    //                        }
-    //                        else
-    //                        {
-    //                            throw exception("no configuration file specified");
-    //                        }
-    //                    }
-    //                    else
-    //                    {
-    //                        char errMsg[MAX_PATH];
-    //                        _snprintf_s(errMsg, _countof(errMsg), _TRUNCATE, "unknown parameter: %S", arg);
+                InstallService(
+                    SERVICE_NAME,               // Name of service
+                    SERVICE_DISP_NAME,          // Display name
+                    SERVICE_DESC,               // Description
+                    wsServiceParams,            // Command-line parameters to pass to the service
+                    dwSvcStartType,             // Service start type
+                    SERVICE_DEPENDENCIES,       // Dependencies
+                    wsSvcAccount,               // Service running account
+                    wsSvcPwd,                   // Password of the account
+                    TRUE,                       // Register with Windows Event Log, so our log messages will be found in Event Viewer
+                    1,                          // We have only one event category, "Service"
+                    NULL                        // No separate resource file, use resources in main executable for messages (default)
+                );
+            }
+            catch (exception const& ex)
+            {
+                wprintf(L"Couldn't install service: %S", ex.what());
+                return 1;
+            }
+            catch (...)
+            {
+                wprintf(L"Couldn't install service: unexpected error");
+                return 2;
+            }
+        }
+        else if (_wcsicmp(L"uninstall", argv[1]) == 0)
+        {
+            UninstallService(SERVICE_NAME);
+        }
+        else if (_wcsicmp(SERVICE_CMD, argv[1]) == 0)
+        {
+            CSampleService service(SERVICE_NAME);
 
-    //                        throw exception(errMsg);
-    //                    }
-    //                }
-    //            }
+            service.SetCommandLine(argc, argv);
 
-    //            InstallService(
-    //                SERVICE_NAME,               // Name of service
-    //                SERVICE_DISP_NAME,          // Display name
-    //                SERVICE_DESC,               // Description
-    //                wsServiceParams,            // Command-line parameters to pass to the service
-    //                dwSvcStartType,             // Service start type
-    //                SERVICE_DEPENDENCIES,       // Dependencies
-    //                wsSvcAccount,               // Service running account
-    //                wsSvcPwd,                   // Password of the account
-    //                TRUE,                       // Register with Windows Event Log, so our log messages will be found in Event Viewer
-    //                1,                          // We have only one event category, "Service"
-    //                NULL                        // No separate resource file, use resources in main executable for messages (default)
-    //            );
-    //        }
-    //        catch (exception const& ex)
-    //        {
-    //            wprintf(L"Couldn't install service: %S", ex.what());
-    //            return 1;
-    //        }
-    //        catch (...)
-    //        {
-    //            wprintf(L"Couldn't install service: unexpected error");
-    //            return 2;
-    //        }
-    //    }
-    //    else if (_wcsicmp(L"uninstall", argv[1]) == 0)
-    //    {
-    //        UninstallService(SERVICE_NAME);
-    //    }
-    //    else if (_wcsicmp(SERVICE_CMD, argv[1]) == 0)
-    //    {
-    //        CSampleService service(SERVICE_NAME);
+            if (!CServiceBase::Run(service))
+            {
+                DWORD dwErr = GetLastError();
 
-    //        service.SetCommandLine(argc, argv);
+                wprintf(L"Service failed to run with error code: 0x%08lx\n", dwErr);
 
-    //        if (!CServiceBase::Run(service))
-    //        {
-    //            DWORD dwErr = GetLastError();
+                return dwErr;
+            }
+        }
+        else if (_wcsicmp(PROCESS_CMD, argv[1]) == 0)
+        {
+            CSampleService service(SERVICE_NAME);
 
-    //            wprintf(L"Service failed to run with error code: 0x%08lx\n", dwErr);
+            service.SetCommandLine(argc, argv);
 
-    //            return dwErr;
-    //        }
-    //    }
-    //    else if (_wcsicmp(PROCESS_CMD, argv[1]) == 0)
-    //    {
-    //        CSampleService service(SERVICE_NAME);
-
-    //        service.SetCommandLine(argc, argv);
-
-    //        service.Run();
-    //    }
-    //    else
-    //    {
-    //        wprintf(L"Unknown parameter: %s\n", argv[1]);
-    //    }
-    //}
-    //else
-    //{
-    //    wprintf(L"\nAstra.XKeysDriver\n\n");
-    //    wprintf(L"Parameters:\n\n");
-    //    wprintf(L" install [-start-type <2..4>]\n  - to install the service.\n");
-    //    wprintf(L"    типы запуска службы:\n");
-    //    wprintf(L"     2 - служба автоматически запускается диспетчером управления службами во время запуска системы.\n");
-    //    wprintf(L"     3 - служба запущена вручную или путем вызова функции StartService из другого процесса.\n");
-    //    wprintf(L"     4 - служба установлена ​​в отключенном состоянии.\n");
-    //    wprintf(L" \n run - запускать как обычный процесс\n");
-    //    wprintf(L" uninstall - удалить службу.\n");
-    //}
+            service.Run();
+        }
+        else
+        {
+            wprintf(L"Unknown parameter: %s\n", argv[1]);
+        }
+    }
+    else
+    {
+        wprintf(L"\nAstra.XKeysDriver\n\n");
+        wprintf(L"Parameters:\n\n");
+        wprintf(L" install [-start-type <2..4>]\n  - to install the service.\n");
+        wprintf(L"    типы запуска службы:\n");
+        wprintf(L"     2 - служба автоматически запускается диспетчером управления службами во время запуска системы.\n");
+        wprintf(L"     3 - служба запущена вручную или путем вызова функции StartService из другого процесса.\n");
+        wprintf(L"     4 - служба установлена ​​в отключенном состоянии.\n");
+        wprintf(L" \n run - запускать как обычный процесс\n");
+        wprintf(L" uninstall - удалить службу.\n");
+    }
 
     return 0;
 }

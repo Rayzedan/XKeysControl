@@ -181,9 +181,9 @@ DWORD SetupDevice::HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 
 		int maxcols = 10;
 		int maxrows = 8;
-		for (int i = 0; i < maxcols; i++) //loop for each column of button data (Max Cols)
+		for (int i = 0; i < maxcols; ++i) //loop for each column of button data (Max Cols)
 		{
-			for (int j = 0; j < maxrows; j++) //loop for each row of button data (Max Rows)
+			for (int j = 0; j < maxrows; ++j) //loop for each row of button data (Max Rows)
 			{
 				int temp1 = pow(2, j);
 				int keynum = maxrows * i + j; //0 based index
@@ -197,7 +197,7 @@ DWORD SetupDevice::HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 			}
 		}
 
-		for (int i = 0; i < readlength; i++)
+		for (int i = 0; i < readlength; ++i)
 		{
 			lastpData[i] = pData[i];  //save it for comparison on next read
 		}
