@@ -147,18 +147,18 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
 
 void OpcUaClient::initialRequest()
 {
-	file = new ParseXml();
-	if (file->getConfigFile() != -1) {
+	m_file = new ParseXml();
+	if (m_file->getConfigFile() != -1) {
 		running = true;
-		file->getSignalMap(signalMap);
-		file->getConfigList(config);
+		m_file->getSignalMap(signalMap);
+		m_file->getConfigList(config);
 		timeout = atoi(config[2].c_str());
 		device->setTimeoutDevice(timeout);
-		requestClientTime = atoi(config[1].c_str());
+		m_requestClientTime = atoi(config[1].c_str());
 		//std::cout << "Device timeout - " << timeout << std::endl;
 		//std::cout << "Request client time - " << requestClientTime << std::endl;
-		client = UA_Client_new();
-		UA_ClientConfig* cc = UA_Client_getConfig(client);
+		m_client = UA_Client_new();
+		UA_ClientConfig* cc = UA_Client_getConfig(m_client);
 		UA_ClientConfig_setDefault(cc);
 		/* Set stateCallback */
 		cc->stateCallback = stateCallback;
@@ -167,27 +167,27 @@ void OpcUaClient::initialRequest()
 	}
 	else {
 		//std::cout << "can`t read configuration file\n";
-		threadState = -1;
+		m_threadState = -1;
 	}
 
 	/* Clean up */
 	/* Disconnects the client internally */
-	UA_Client_disconnect(client);
-	threadState = 1;
+	UA_Client_disconnect(m_client);
+	m_threadState = 1;
 }
 
 int OpcUaClient::getCurrentState()
 {
-	return threadState;
+	return m_threadState;
 }
 
 void OpcUaClient::stopSession()
 {
 	device->setAllRed();
 	running = false;
-	UA_Client_delete(client);
+	UA_Client_delete(m_client);
 	delete device;
-	delete file;
+	delete m_file;
 }
 
 bool OpcUaClient::infiniteRequest()
@@ -209,22 +209,22 @@ bool OpcUaClient::infiniteRequest()
 		bool deviceIndicator = device->getCurrentState();
 		UA_StatusCode retval = UA_STATUSCODE_BAD;
 		if (deviceIndicator)
-			retval = UA_Client_connect(client, config[0].c_str());
+			retval = UA_Client_connect(m_client, config[0].c_str());
 		else {
 			if (retval == UA_STATUSCODE_GOOD)
-				UA_Client_disconnect(client);
+				UA_Client_disconnect(m_client);
 			//std::cout << "DEVICE ERROR\n";
 			continue;
 		}
 
 		if (retval != UA_STATUSCODE_GOOD) {
 			//std::cout << "Not connected. Retrying to connect in " << requestClientTime << " second...\n";
-			UA_sleep_ms(requestClientTime * 1000);
+			UA_sleep_ms(m_requestClientTime * 1000);
 			continue;
 		}
 		if (deviceIndicator && retval == UA_STATUSCODE_GOOD)
-			UA_Client_run_iterate(client, requestClientTime * 1000);
-		threadState = 0;
+			UA_Client_run_iterate(m_client, m_requestClientTime * 1000);
+		m_threadState = 0;
 	}
 	return false;
 }

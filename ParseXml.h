@@ -13,7 +13,7 @@ public:
 	int getConfigFile();
 private:
 	int convertIndexButton(int index);
-	std::map<int, std::pair<std::string, int>> signals;
-	std::vector<std::string> config;
+	std::map<int, std::pair<std::string, int>> m_signals;
+	std::vector<std::string> m_config;
 };
 

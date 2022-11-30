@@ -19,10 +19,10 @@ public:
 	void stopSession();
 private:
 	bool infiniteRequest();
-	int requestClientTime = 5;
-	int threadState;
-	ParseXml* file;
-	UA_Client* client;
+	int m_requestClientTime = 5;
+	int m_threadState;
+	ParseXml* m_file;
+	UA_Client* m_client;
 	static void handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* subContext,
 		UA_UInt32 monId, void* monContext, 
 		UA_DataValue* value);
