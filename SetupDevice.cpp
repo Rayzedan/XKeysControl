@@ -20,13 +20,13 @@ DWORD timeoutDevice = 30;
 
 SetupDevice::SetupDevice()
 {
-	std::cout << "Create SetupDevice\n";
+	std::cout << "Create module Setup Device...\n";
 	SetupDevice::installDevice();
 }
 
 SetupDevice::~SetupDevice()
 {
-	std::cout << "Delete SetupDevice\n";
+	std::cout << "Delete module Setup Device...\n";
 }
 
 bool SetupDevice::getCurrentState()
@@ -63,7 +63,7 @@ void SetupDevice::installDevice()
 {
 	TEnumHIDInfo info[128];
 	char errordescription[100];
-	std::cout << "Setup device...\n";
+	//std::cout << "Setup device...\n";
 
 	DWORD result = 0;
 	result = EnumeratePIE(0x5F3, info, count);
@@ -81,7 +81,7 @@ void SetupDevice::installDevice()
 		std::cout << "No device found...\n";
 	}
 	else {
-		std::cout << "Found device...\n";
+		//std::cout << "Found device...\n";
 		isDeviceEnable = true;
 		for (long i = 0; i < count; ++i) {
 			pid = info[i].PID; //get the device pid		
@@ -92,17 +92,17 @@ void SetupDevice::installDevice()
 			{
 				hnd = info[i].Handle; //handle required for piehid.dll calls
 				result = SetupInterfaceEx(hnd);
-				std::cout << "Find new PI Engineering Device\n";
+				//std::cout << "Find new PI Engineering Device\n";
 			}
 		}
 		//Turn on the data callback	
 		result = SetDataCallback(hnd, HandleDataEvent);
-		//result = SetErrorCallback(hnd, HandleErrorEvent);
-		//SuppressDuplicateReports(hnd, true);
-		//DisableDataCallback(hnd, false); //turn on callback in the case it was turned off by some other command
+		result = SetErrorCallback(hnd, HandleErrorEvent);
+		SuppressDuplicateReports(hnd, true);
+		DisableDataCallback(hnd, false); //turn on callback in the case it was turned off by some other command
 		if (result != 0) {
 			GetErrorString(result, errordescription, 100);
-			std::cout << "error description - " << errordescription << std::endl;
+			//std::cout << "error description - " << errordescription << std::endl;
 		}
 
 		int wlen = GetWriteLength(hnd);
@@ -137,7 +137,7 @@ void SetupDevice::installDevice()
 void SetupDevice::callbackSetLED(int indexButton, int indexState)
 {
 	DWORD result = 0;
-	std::cout << "callback set led was used\n";
+	//std::cout << "callback set led was used\n";
 	if (indexState == 1 && buttonsMap.count(indexButton) != 0) {
 		if (buttonsMap[indexButton].indexState == 0) {
 			writeDeviceData(181, indexButton + 80, 1);
@@ -148,7 +148,7 @@ void SetupDevice::callbackSetLED(int indexButton, int indexState)
 void SetupDevice::setLED(int indexButton, int indexState, bool isStatusGood)
 {
 	DWORD result = 0;
-	std::cout << "INDEX BUTTON - " << indexButton << " INDEX STATE - " << indexState << std::endl;
+	//std::cout << "INDEX BUTTON - " << indexButton << " INDEX STATE - " << indexState << std::endl;
 	if (isStatusGood) {
 		buttonsMap[indexButton].isEnable = true;
 		if (indexState == 1) {
@@ -176,7 +176,7 @@ DWORD SetupDevice::HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 	char dataStr2[256];
 	int readlength = 0;
 	if (pData != nullptr) {
-		std::cout << "pData != nullptr\n";
+		//std::cout << "pData != nullptr\n";
 		int d = _itoa_s(pData[1], dataStr2, 10);
 
 		int maxcols = 10;
@@ -202,9 +202,6 @@ DWORD SetupDevice::HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 			lastpData[i] = pData[i];  //save it for comparison on next read
 		}
 	}
-	else {
-		std::cout << "EXCEPT NULLPTR PDATA\n";
-	}
 
 
 	//error handling
@@ -212,13 +209,8 @@ DWORD SetupDevice::HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 	{
 		CleanupInterface(hnd);
 		MessageBeep(MB_ICONHAND);
-		std::cout << "Device disconnected\n";
+		//std::cout << "Device disconnected\n";
 		isDeviceEnable = false;
-		//while (!isDeviceEnable)
-		//{
-		//	Sleep(timeoutDevice * 1000);
-		//	installDevice();			
-		//}
 	}
 	return TRUE;
 }
@@ -226,7 +218,7 @@ DWORD SetupDevice::HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 DWORD SetupDevice::HandleErrorEvent(DWORD deviceID, DWORD status)
 {
 	MessageBeep(MB_ICONHAND);
-	std::cout << "Error from error callback\n";
+	//std::cout << "Error from error callback\n";
 	return TRUE;
 }
 

@@ -5,24 +5,18 @@
 
 ParseXml::ParseXml() 
 {
-
+    std::cout << "Create module Parse XML...\n";
 }
 ParseXml::~ParseXml() 
 {
-
+    std::cout << "Delete module Parse XML...\n";
 }
 
 void ParseXml::getSignalMap(std::map<int, std::pair<std::string, int>>& temp)
 {
     if (signals.size() > 0) {
-        temp = signals;
-        std::cout << "get map\n";
-    }
-    else {
-        std::cout << "map is empty\n";
-    }
-        
-
+        temp = signals;       
+    }   
 }
 
 void ParseXml::getConfigList(std::vector<std::string> &temp)
@@ -94,10 +88,6 @@ int ParseXml::getConfigFile()
                 config.push_back(attr.value());
             }
         }
-        if (signals.size() > 0)
-            std::cout << "finished reading signal map from xml-file\n";
-        else
-            std::cout << "finished reading signal map from xml-file\n";
         return 0;
     }
     else {

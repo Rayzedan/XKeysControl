@@ -1,6 +1,5 @@
 #include "OpcUaClient.h"
 #include "SetupDevice.h"
-#include "ParseXml.h"
 #include <iostream>
 #include <vector>
 #include <map>
@@ -24,13 +23,13 @@ SetupDevice* device = new SetupDevice();
 
 OpcUaClient::OpcUaClient()
 {
-	std::cout << "Create OpcUaClient\n";
+	std::cout << "Create module OPC UA Client...\n";
 	running = false;
 }
 
 OpcUaClient::~OpcUaClient()
 {
-	//std::cout << "DELETE OPC UA CLIENT\n";
+	std::cout << "Delete module OPC UA Client...\n";
 }
 
 void OpcUaClient::handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* subContext, UA_UInt32 monId, void* monContext, UA_DataValue* value)
@@ -46,13 +45,13 @@ void OpcUaClient::handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* s
 
 		bool isEnable = subcribeMap[key].isSignalGood;
 		UA_Boolean error = *(UA_Boolean*)value->value.data;
-		std::cout << "status code - " << status << std::endl;
+		//std::cout << "status code - " << status << std::endl;
 		if (error) {
-			std::cout << "error - " << index << std::endl;
+			//std::cout << "error - " << index << std::endl;
 			device->setLED(index, 2, isEnable);
 		}
 		else {
-			std::cout << "default - " << index << std::endl;
+			//std::cout << "default - " << index << std::endl;
 			device->setLED(index, 1, isEnable);
 		}
 	}
@@ -75,17 +74,17 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
 	switch (channelState) {
 	case UA_SECURECHANNELSTATE_FRESH:
 	case UA_SECURECHANNELSTATE_CLOSED:
-		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "The client is disconnected");
+		//UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "The client is disconnected");
 		device->setAllRed();
 		break;
 	case UA_SECURECHANNELSTATE_HEL_SENT:
-		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Waiting for ack");
+		//UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Waiting for ack");
 		break;
 	case UA_SECURECHANNELSTATE_OPN_SENT:
-		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Waiting for OPN Response");
+		//UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Waiting for OPN Response");
 		break;
 	case UA_SECURECHANNELSTATE_OPEN:
-		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "A SecureChannel to the server is open");
+		//UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "A SecureChannel to the server is open");
 		break;
 	default:
 		break;
@@ -93,14 +92,8 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
 
 	switch (sessionState) {
 	case UA_SESSIONSTATE_ACTIVATED: {
-		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "A session with the server is activated");
+		//UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "A session with the server is activated");
 		device->setAllBlue();
-		if (signalMap.size() > 0) {
-			std::cout << "start reading signal map...\n";
-		}
-		else {
-			std::cout << "signal map is empty\n";
-		}
 		/* A new session was created. We need to create the subscription. */
 		/* Create a subscription */
 		for (const auto& item : signalMap) {
@@ -137,14 +130,14 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
 					subcribeMap[key].indexButton = value;
 					subcribeMap[key].isSignalGood = isEnable;
 					subcribeMap[key].node = currentNode;
-					std::cout << "KEY - " << key << " index button - " << value << " isGoodSignal - " << isEnable << std::endl;
+					//std::cout << "KEY - " << key << " index button - " << value << " isGoodSignal - " << isEnable << std::endl;
 				}
 			}
 		}
 	}
 								  break;
 	case UA_SESSIONSTATE_CLOSED:
-		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Session disconnected");
+		//UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Session disconnected");
 		device->setAllRed();
 		break;
 	default:
@@ -162,8 +155,8 @@ void OpcUaClient::initialRequest()
 		timeout = atoi(config[2].c_str());
 		device->setTimeoutDevice(timeout);
 		requestClientTime = atoi(config[1].c_str());
-		std::cout << "Device timeout - " << timeout << std::endl;
-		std::cout << "Request client time - " << requestClientTime << std::endl;
+		//std::cout << "Device timeout - " << timeout << std::endl;
+		//std::cout << "Request client time - " << requestClientTime << std::endl;
 		client = UA_Client_new();
 		UA_ClientConfig* cc = UA_Client_getConfig(client);
 		UA_ClientConfig_setDefault(cc);
@@ -173,13 +166,12 @@ void OpcUaClient::initialRequest()
 		infiniteRequest();
 	}
 	else {
-		std::cout << "can`t read configuration file\n";
+		//std::cout << "can`t read configuration file\n";
 		threadState = -1;
 	}
 
 	/* Clean up */
 	/* Disconnects the client internally */
-	std::cout << "Delete client\n";
 	UA_Client_disconnect(client);
 	threadState = 1;
 }
@@ -203,11 +195,11 @@ bool OpcUaClient::infiniteRequest()
 	/* Endless loop runAsync */
 	while (!device->getCurrentState()) {
 		running = false;
-		std::cout << "trying to connect to device...\n";
+		//std::cout << "trying to connect to device...\n";
 	}
 	if (device->getCurrentState()) {
 		running = true;
-		std::cout << "start async request\n";
+		//std::cout << "start async request\n";
 	}
 
 	while (running) {
@@ -226,7 +218,7 @@ bool OpcUaClient::infiniteRequest()
 		}
 
 		if (retval != UA_STATUSCODE_GOOD) {
-			std::cout << "Not connected. Retrying to connect in " << requestClientTime << " second...\n";
+			//std::cout << "Not connected. Retrying to connect in " << requestClientTime << " second...\n";
 			UA_sleep_ms(requestClientTime * 1000);
 			continue;
 		}
@@ -234,6 +226,5 @@ bool OpcUaClient::infiniteRequest()
 			UA_Client_run_iterate(client, requestClientTime * 1000);
 		threadState = 0;
 	}
-	std::cout << "exit from loop\n";
 	return false;
 }

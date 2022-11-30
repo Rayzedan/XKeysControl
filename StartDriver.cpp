@@ -1,5 +1,4 @@
 ﻿#include <regex>
-#include <iostream>
 #include <tchar.h>
 #include "StdAfx.h"
 #include "WindowsService.h"
