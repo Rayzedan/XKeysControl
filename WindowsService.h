@@ -10,7 +10,7 @@
 #define SERVICE_DEPENDENCIES     L""
 
 // Default name of the account under which the service should run
-#define SERVICE_ACCOUNT          L"NT AUTHORITY\\LocalSystem"
+#define SERVICE_ACCOUNT          L"NT AUTHORITY\\LocalService"
 
 // Default password to the service account name
 #define SERVICE_PASSWORD         NULL
@@ -25,13 +25,13 @@
 #define PROCESS_CMD              L"run"
 
 // Service name
-#define SERVICE_NAME             L"Astra.XKeysDriver"
+#define SERVICE_NAME             L"Astra.Keyboard"
 
 // Service name as displayed in MMC
-#define SERVICE_DISP_NAME        L"Astra.XKeysDriver"
+#define SERVICE_DISP_NAME        L"Astra.Keyboard"
 
 // Service description as displayed in MMC
-#define SERVICE_DESC             L"Служба для управления клавиатурой X-Keys XK-60"
+#define SERVICE_DESC             L"Служба для управления программируемой клавиатурой"
 
 using namespace std;
 

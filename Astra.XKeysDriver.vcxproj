@@ -81,8 +81,8 @@
     <LibraryPath>C:\Users\d.bezlepkin\Documents\WindowsServiceProject\service-base\x64\Debug;C:\Program Files %28x86%29\pugixml\lib;C:\Program Files %28x86%29\open62541\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Program Files %28x86%29\pugixml\include;C:\Program Files %28x86%29\open62541\include;C:\Users\d.bezlepkin\Documents\WindowsServiceProject\service-base;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\d.bezlepkin\Documents\WindowsServiceProject\service-base\x64\Debug;C:\Program Files %28x86%29\pugixml\lib;C:\Program Files %28x86%29\open62541\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files %28x86%29\pugixml\include;C:\Program Files %28x86%29\open62541\include;C:\Users\d.bezlepkin\Desktop\BasicClass\service-base;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\d.bezlepkin\Desktop\BasicClass\service-base\x64\Release;C:\Program Files %28x86%29\pugixml\lib;C:\Program Files %28x86%29\open62541\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
