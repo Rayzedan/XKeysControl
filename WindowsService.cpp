@@ -26,75 +26,76 @@ CSampleService::CSampleService(PCWSTR pszServiceName,
 
 void CSampleService::OnStart(DWORD /* useleses */, PWSTR* /* useless */)
 {
-    //const wchar_t* wsConfigFullPath = SERVICE_CONFIG_FILE;
-    //bool bRunAsService = true;
+    const wchar_t* wsConfigFullPath = SERVICE_CONFIG_FILE;
+    bool bRunAsService = true;
 
-    //// Log a service start message to the Application log.
-    //WriteLogEntry(L"Astra.XKeysDriver is starting...", EVENTLOG_INFORMATION_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
+    // Log a service start message to the Application log.
+    WriteLogEntry(L"Astra.XKeysDriver is starting...", EVENTLOG_INFORMATION_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
 
-    //if (m_argc > 1)
-    //{
-    //    bRunAsService = (_wcsicmp(SERVICE_CMD, m_argv[1]) == 0);
+    if (m_argc > 1)
+    {
+        bRunAsService = (_wcsicmp(SERVICE_CMD, m_argv[1]) == 0);
 
-    //    // Check if the config file was specified on the service command line
-    //    if (m_argc > 2) // the argument at 1 should be "run mode", so we start at 2
-    //    {
-    //        if (_wcsicmp(L"-config", m_argv[2]) == 0)
-    //        {
-    //            if (m_argc > 3)
-    //            {
-    //                wsConfigFullPath = m_argv[3];
-    //            }
-    //            else
-    //            {
-    //                throw exception("no configuration file name");
-    //            }
-    //        }
-    //    }
-    //}
-    //else
-    //{
-    //    WriteLogEntry(L"Astra.XKeysDriver:\nNo run mode specified.", EVENTLOG_ERROR_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
-    //    throw exception("no run mode specified");
-    //}
+        // Check if the config file was specified on the service command line
+        if (m_argc > 2) // the argument at 1 should be "run mode", so we start at 2
+        {
+            if (_wcsicmp(L"-config", m_argv[2]) == 0)
+            {
+                if (m_argc > 3)
+                {
+                    wsConfigFullPath = m_argv[3];
+                }
+                else
+                {
+                    throw exception("no configuration file name");
+                }
+            }
+        }
+    }
+    else
+    {
+        WriteLogEntry(L"Astra.XKeysDriver:\nNo run mode specified.", EVENTLOG_ERROR_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
+        throw exception("no run mode specified");
+    }
 
-    //try
-    //{
-    //    // Here we would load configuration file
-    //    // but instead we're just writing to event log the configuration file name
-    //    wstring infoMsg = L"Astra.XKeysDriver\n The service is pretending to read configuration from ";
-    //    infoMsg += wsConfigFullPath;
-    //    WriteLogEntry(infoMsg.c_str(), EVENTLOG_INFORMATION_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
-    //}
-    //catch (exception const& e)
-    //{
-    //    WCHAR wszMsg[MAX_PATH];
+    try
+    {
+        // Here we would load configuration file
+        // but instead we're just writing to event log the configuration file name
+        wstring infoMsg = L"Astra.XKeysDriver\n The service is pretending to read configuration from ";
+        infoMsg += wsConfigFullPath;
+        WriteLogEntry(infoMsg.c_str(), EVENTLOG_INFORMATION_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
+    }
+    catch (exception const& e)
+    {
+        WCHAR wszMsg[MAX_PATH];
 
-    //    _snwprintf_s(wszMsg, _countof(wszMsg), _TRUNCATE, L"Astra.XKeysDriver\nError reading configuration %S", e.what());
+        _snwprintf_s(wszMsg, _countof(wszMsg), _TRUNCATE, L"Astra.XKeysDriver\nError reading configuration %S", e.what());
 
-    //    WriteLogEntry(wszMsg, EVENTLOG_ERROR_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
-    //}
+        WriteLogEntry(wszMsg, EVENTLOG_ERROR_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
+    }
 
-    //if (bRunAsService)
-    //{
-    //    WriteLogEntry(L"Astra.XKeysDriver will run as a service.", EVENTLOG_INFORMATION_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
+    if (bRunAsService)
+    {
+        WriteLogEntry(L"Astra.XKeysDriver will run as a service.", EVENTLOG_INFORMATION_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
 
-    //    // Add the main service function for execution in a worker thread.
-    //    if (!CreateThread(NULL, 0, ServiceRunner, this, 0, NULL))
-    //    {
-    //        WriteLogEntry(L"Astra.XKeysDriver couldn't create worker thread.", EVENTLOG_ERROR_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
-    //    }
-    //}
-    //else
-    //{
+        // Add the main service function for execution in a worker thread.
+        if (!CreateThread(NULL, 0, ServiceRunner, this, 0, NULL))
+        {
+            WriteLogEntry(L"Astra.XKeysDriver couldn't create worker thread.", EVENTLOG_ERROR_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
+        }
+    }
+    else
+    {
         std::cout << "Astra.XKeysDriver is running as a regular process.\n";
 
         CSampleService::ServiceRunner(this);
-    //}
+    }
 }
 
 CSampleService::~CSampleService()
 {
+
 }
 
 void CSampleService::Run()
