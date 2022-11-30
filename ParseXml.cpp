@@ -37,17 +37,19 @@ int ParseXml::getConfigFile()
     TCHAR tempPath[MAX_PATH]; //or wchar_t * buffer;
     GetModuleFileName(NULL, tempPath, MAX_PATH);
     std::string path(tempPath);
-    std::string xmlPath = "\\keyboard_config.xml";
+    std::string xmlPath = "\\config.xml";
     size_t index = path.rfind('\\');
     if (index != std::string::npos) {
-        path.replace(index,xmlPath.size()+2, xmlPath);
+        path.replace(index,xmlPath.size()+8, xmlPath);
         std::string::iterator iter = std::find(path.begin(), path.end(), '/');
         if (iter < path.end())
             std::replace(++iter, path.end(), '/', '\\');
     }
+    std::cout << "path - " << path << std::endl;
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file(path.c_str());
     if (result) {
+        std::cout << "not null\n";
         pugi::xml_node tools = doc.child("configuration").child("Buttons");
         for (pugi::xml_node tool = tools.first_child(); tool; tool = tool.next_sibling())
         {
