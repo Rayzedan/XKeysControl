@@ -10,10 +10,9 @@ public:
 	void setAllRed();
 	void setAllBlue();
 	void setTimeoutDevice(DWORD timeout);
-	void initialDevice();
-	bool getCurrentState();
+	static bool getCurrentState();
 private:
-	static void writeDeviceData(int indexButton, int indexState);
+	static void writeDeviceData(int bufferKey,int indexButton, int indexState);
 	static DWORD __stdcall HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error);
 	static DWORD __stdcall HandleErrorEvent(DWORD deviceID, DWORD status);
 	static void __stdcall installDevice();
