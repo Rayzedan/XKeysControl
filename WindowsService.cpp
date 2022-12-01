@@ -153,7 +153,7 @@ void CSampleService::OnStop()
 {
     // Log a service stop message to the Application log.
     WriteLogEntry(L"Astra.Keyboard is stopping", EVENTLOG_INFORMATION_TYPE, MSG_SHUTDOWN, CATEGORY_SERVICE);
-    std:cout << "Astra.Keyboard is stopping\n";
+    //std:cout << "Astra.Keyboard is stopping\n";
     // Indicate that the service is stopping and wait for the finish of the
     // main service function (ServiceWorkerThread).
     m_bIsStopping = TRUE;

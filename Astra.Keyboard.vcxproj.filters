@@ -66,7 +66,10 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Astra.Keyboard1.rc">
+    <ResourceCompile Include="Astra.Keyboard.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="..\..\..\Documents\WindowsServiceProject\service-base\sample-service\event_ids.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
