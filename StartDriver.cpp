@@ -48,40 +48,7 @@ int wmain(int argc, wchar_t* argv[])
                             {
                                 throw exception("не выбран режим установки");
                             }
-                        }
-                        else if (_wcsicmp(L"-account", arg) == 0)
-                        {
-                            if (argc > i)
-                            {
-                                wsSvcAccount = argv[++i];
-                            }
-                            else
-                            {
-                                throw exception("no account name after -account");
-                            }
-                        }
-                        else if (_wcsicmp(L"-password", arg) == 0)
-                        {
-                            if (argc > i)
-                            {
-                                wsSvcPwd = argv[++i];
-                            }
-                            else
-                            {
-                                throw exception("no password  after -password");
-                            }
-                        }
-                        else if (_wcsicmp(L"-config", arg) == 0)
-                        {
-                            if (argc > i)
-                            {
-                                _snwprintf_s(wsServiceParams, _countof(wsServiceParams), _TRUNCATE, L"%s -config \"%s\"", SERVICE_CMD, argv[++i]);
-                            }
-                            else
-                            {
-                                throw exception("no configuration file specified");
-                            }
-                        }
+                        }                     
                         else
                         {
                             char errMsg[MAX_PATH];
@@ -118,8 +85,7 @@ int wmain(int argc, wchar_t* argv[])
             }
         }
         else if (_wcsicmp(L"uninstall", argv[1]) == 0)
-        {
-            
+        {            
             UninstallService(SERVICE_NAME);
         }
         else if (_wcsicmp(SERVICE_CMD, argv[1]) == 0)
@@ -157,8 +123,8 @@ int wmain(int argc, wchar_t* argv[])
         wprintf(L" install [-start-type <2..4>]\n  - to install the service.\n");
         wprintf(L"    типы запуска службы:\n");
         wprintf(L"     2 - служба автоматически запускается диспетчером управления службами во время запуска системы.\n");
-        wprintf(L"     3 - служба запущена вручную или путем вызова функции StartService из другого процесса.\n");
-        wprintf(L"     4 - служба установлена ​​в отключенном состоянии.\n");
+        wprintf(L"     3 - служба должна быть запущена вручную или путем вызова функции StartService из другого процесса.\n");
+        wprintf(L"     4 - служба будет установлена ​​в отключенном состоянии.\n");
         wprintf(L" \n run - запускать как обычный процесс\n");
         wprintf(L" uninstall - удалить службу.\n");
     }
