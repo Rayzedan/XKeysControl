@@ -165,7 +165,8 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Astra.Keyboard1.rc" />
+    <ResourceCompile Include="..\..\..\Documents\WindowsServiceProject\service-base\sample-service\event_ids.rc" />
+    <ResourceCompile Include="Astra.Keyboard.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\Downloads\Astra.KeyboardIcon.ico" />
