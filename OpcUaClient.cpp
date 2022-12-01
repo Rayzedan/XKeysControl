@@ -23,13 +23,13 @@ SetupDevice* device = new SetupDevice();
 
 OpcUaClient::OpcUaClient()
 {
-	std::cout << "Create module OPC UA Client...\n";
+	//std::cout << "Create module OPC UA Client...\n";
 	running = false;
 }
 
 OpcUaClient::~OpcUaClient()
 {
-	std::cout << "Delete module OPC UA Client...\n";
+	//std::cout << "Delete module OPC UA Client...\n";
 }
 
 void OpcUaClient::handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* subContext, UA_UInt32 monId, void* monContext, UA_DataValue* value)
@@ -185,9 +185,12 @@ void OpcUaClient::stopSession()
 {
 	device->setAllRed();
 	running = false;
-	UA_Client_delete(m_client);
-	delete device;
-	delete m_file;
+	if (m_client != nullptr)
+		UA_Client_delete(m_client);
+	if (device != nullptr)
+		delete device;
+	if (m_file != nullptr)
+		delete m_file;
 }
 
 bool OpcUaClient::infiniteRequest()

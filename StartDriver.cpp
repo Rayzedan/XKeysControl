@@ -119,6 +119,7 @@ int wmain(int argc, wchar_t* argv[])
         }
         else if (_wcsicmp(L"uninstall", argv[1]) == 0)
         {
+            
             UninstallService(SERVICE_NAME);
         }
         else if (_wcsicmp(SERVICE_CMD, argv[1]) == 0)
