@@ -163,7 +163,8 @@ void OpcUaClient::initialRequest()
 		/* Set stateCallback */
 		cc->stateCallback = stateCallback;
 		cc->subscriptionInactivityCallback = subscriptionInactivityCallback;
-		infiniteRequest();
+		if (!infiniteRequest())
+			m_threadState = 2;
 	}
 	else {
 		//std::cout << "can`t read configuration file\n";
@@ -183,8 +184,11 @@ int OpcUaClient::getCurrentState()
 
 void OpcUaClient::stopSession()
 {
-	device->setAllRed();
 	running = false;
+	subcribeMap.clear();
+	signalMap.clear();
+	config.clear();
+	device->setAllRed();
 	if (m_client != nullptr)
 		UA_Client_delete(m_client);
 	if (device != nullptr)

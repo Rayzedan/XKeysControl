@@ -4,7 +4,7 @@
 		<ServerAddress value="opc.tcp://localhost:62544" />
 	</OpcServer>
   <UpdateClientTime value="5" />
-  <SetupDeviceTime value="5" />
+  <SetupDeviceTime value="30" />
   <Buttons>
 	<Button  Number="1" EnableOPC="1" SignalPath="Object.error" />	
 	<Button  Number="2" EnableOPC="1" SignalPath="Object.CRITICAL" />

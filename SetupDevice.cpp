@@ -21,7 +21,6 @@ DWORD timeoutDevice = 30;
 SetupDevice::SetupDevice()
 {
 	//std::cout << "Create module Setup Device...\n";
-	SetupDevice::installDevice();
 }
 
 SetupDevice::~SetupDevice()
