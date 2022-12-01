@@ -5,11 +5,11 @@
 
 ParseXml::ParseXml() 
 {
-    std::cout << "Create module Parse XML...\n";
+    //std::cout << "Create module Parse XML...\n";
 }
 ParseXml::~ParseXml() 
 {
-    std::cout << "Delete module Parse XML...\n";
+    //std::cout << "Delete module Parse XML...\n";
 }
 
 void ParseXml::getSignalMap(std::map<int, std::pair<std::string, int>>& temp)

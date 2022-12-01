@@ -165,11 +165,10 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="event_ids.mc" />
-    <None Include="MSG00409.bin" />
+    <ResourceCompile Include="Astra.Keyboard1.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="event_ids.rc" />
+    <Image Include="..\..\..\Downloads\Astra.KeyboardIcon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

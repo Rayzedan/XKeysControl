@@ -30,9 +30,6 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="OpcUaClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -48,14 +45,9 @@
     <ClInclude Include="PieHid64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="MSG00409.bin">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="event_ids.mc">
-      <Filter>Resource Files</Filter>
-    </None>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -69,7 +61,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="event_ids.rc">
+    <Image Include="..\..\..\Downloads\Astra.KeyboardIcon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Astra.Keyboard1.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

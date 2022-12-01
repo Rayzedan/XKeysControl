@@ -20,13 +20,13 @@ DWORD timeoutDevice = 30;
 
 SetupDevice::SetupDevice()
 {
-	std::cout << "Create module Setup Device...\n";
+	//std::cout << "Create module Setup Device...\n";
 	SetupDevice::installDevice();
 }
 
 SetupDevice::~SetupDevice()
 {
-	std::cout << "Delete module Setup Device...\n";
+	//std::cout << "Delete module Setup Device...\n";
 }
 
 bool SetupDevice::getCurrentState()
@@ -71,14 +71,14 @@ void SetupDevice::installDevice()
 	{
 		isDeviceEnable = false;
 		if (result == 102) {
-			std::cout << "No PI Engineering Devices Found\n";
+			//std::cout << "No PI Engineering Devices Found\n";
 		}
 		else {
-			std::cout << "Error finding PI Engineering Devices\n";
+			//std::cout << "Error finding PI Engineering Devices\n";
 		}
 	}
 	else if (count == 0) {
-		std::cout << "No device found...\n";
+		//std::cout << "No device found...\n";
 	}
 	else {
 		//std::cout << "Found device...\n";

@@ -43,7 +43,7 @@ class CSampleService: public CServiceBase
                    BOOL fCanShutdown = TRUE,
                    BOOL fCanPauseContinue = FALSE
                   );
-    ~CSampleService();
+    virtual ~CSampleService();
 
     virtual void OnStart(DWORD dwArgc, PWSTR *pszArgv);
 
