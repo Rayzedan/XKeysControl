@@ -18,6 +18,7 @@ public:
 	void initialRequest();
 	void stopSession();
 private:
+	bool commandStop;
 	bool infiniteRequest();
 	int m_requestClientTime = 5;
 	int m_threadState;
