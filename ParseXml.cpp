@@ -10,6 +10,10 @@ ParseXml::ParseXml()
 ParseXml::~ParseXml() 
 {
     //std::cout << "Delete module Parse XML...\n";
+    if (m_signals.size() > 0)
+        m_signals.clear();
+    if (m_config.size() > 0)
+        m_config.clear();
 }
 
 void ParseXml::getSignalMap(std::map<int, std::pair<std::string, int>>& temp)

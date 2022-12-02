@@ -26,6 +26,8 @@ SetupDevice::SetupDevice()
 SetupDevice::~SetupDevice()
 {
 	//std::cout << "Delete module Setup Device...\n";
+	isDeviceEnable = false;
+	buttonsMap.clear();
 }
 
 bool SetupDevice::getCurrentState()

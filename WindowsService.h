@@ -52,8 +52,7 @@ class CSampleService: public CServiceBase
     static DWORD __stdcall ServiceRunner(void* self);
 
     void Run();
-
-  private:    
+  private:
     BOOL m_bIsStopping;
     HANDLE m_hHasStoppedEvent;
     wstring m_wstrParam;
