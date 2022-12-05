@@ -5,8 +5,6 @@
 #include <map>
 #include <string>
 
-
-UA_Boolean running;
 struct signalNode
 {
 	int indexButton;
@@ -23,7 +21,6 @@ SetupDevice* device = new SetupDevice();
 
 OpcUaClient::OpcUaClient()
 {
-	commandStop = false;
 	running = false;
 }
 
@@ -162,8 +159,8 @@ void OpcUaClient::initialRequest()
 		cc->stateCallback = stateCallback;
 		cc->subscriptionInactivityCallback = subscriptionInactivityCallback;
 		if (!infiniteRequest()) {
-			m_threadState = 2;			
-		}			
+			m_threadState = 2;
+		}
 	}
 	else {
 		m_threadState = -1;
@@ -184,7 +181,6 @@ int OpcUaClient::getCurrentState()
 void OpcUaClient::stopSession()
 {
 	running = false;
-	commandStop = true;
 	subcribeMap.clear();
 	signalMap.clear();
 	config.clear();
@@ -206,32 +202,28 @@ bool OpcUaClient::infiniteRequest()
 	if (device->getCurrentState()) {
 		running = true;
 	}
-	while (!commandStop) {
-		while (running) {
-			/* if already connected, this will return GOOD and do nothing */
-			/* if the connection is closed/errored, the connection will be reset and then reconnected */
-			/* Alternatively you can also use UA_Client_getState to get the current state */
-			bool deviceIndicator = device->getCurrentState();
-			UA_StatusCode retval = UA_STATUSCODE_BAD;
-			if (deviceIndicator)
-				retval = UA_Client_connect(m_client, config[0].c_str());
-			else {
-				if (retval == UA_STATUSCODE_GOOD)
-					UA_Client_disconnect(m_client);
-				//std::cout << "DEVICE ERROR\n";
-				continue;
-			}
 
-			if (retval != UA_STATUSCODE_GOOD) {
-				//std::cout << "Not connected. Retrying to connect in " << requestClientTime << " second...\n";
-				UA_sleep_ms(m_requestClientTime * 1000);
-				continue;
-			}
-			if (deviceIndicator && retval == UA_STATUSCODE_GOOD)
-				UA_Client_run_iterate(m_client, m_requestClientTime * 1000);
-			m_threadState = 0;
+	while (running) {
+		/* if already connected, this will return GOOD and do nothing */
+		/* if the connection is closed/errored, the connection will be reset and then reconnected */
+		/* Alternatively you can also use UA_Client_getState to get the current state */
+		bool deviceIndicator = device->getCurrentState();
+		UA_StatusCode retval = UA_STATUSCODE_BAD;
+		if (deviceIndicator)
+			retval = UA_Client_connect(m_client, config[0].c_str());
+		else {
+			if (retval == UA_STATUSCODE_GOOD)
+				UA_Client_disconnect(m_client);
+			continue;
 		}
-	}
 
+		if (retval != UA_STATUSCODE_GOOD) {
+			UA_sleep_ms(m_requestClientTime * 1000);
+			continue;
+		}
+		if (deviceIndicator && retval == UA_STATUSCODE_GOOD)
+			UA_Client_run_iterate(m_client, m_requestClientTime * 1000);		
+	}
+	m_threadState = 0;
 	return false;
 }
