@@ -12,7 +12,7 @@
 Установка:
 1. git clone git@github.com:Rayzedan/XKeysControl.git
 2. Собрать проект с помощью MSVC 2022, зайти через cmd запущенную с правами администратора в папку /Release, выполнить .\Astra.XKeysDriver.exe run для тестирования проекта.
-3. Для установки службы выполнить .\Astra.XKeysDriver.exe install -2
+3. Для установки службы выполнить .\Astra.XKeysDriver.exe install 2
 4. При успешной установке перезапустить ПК.
 5. Поменять конфигурацию в файле на нужную вам. (файл нужно переместить в каталог с Astra.XKeysDriver.exe)
 Пример конфигурационного файла лежит в репозитории (см. keyboard_config.xml).
