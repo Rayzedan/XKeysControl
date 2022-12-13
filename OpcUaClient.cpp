@@ -64,44 +64,26 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
 	UA_SessionState sessionState, UA_StatusCode recoveryStatus)
 {
 	switch (channelState) {
-	case UA_SECURECHANNELSTATE_FRESH:
-	case UA_SECURECHANNELSTATE_CLOSED:
-		//UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "The client is disconnected");
+	case UA_SECURECHANNELSTATE_CLOSED:		
 		device->setAllRed();
-		break;
-	case UA_SECURECHANNELSTATE_HEL_SENT:
-		//UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Waiting for ack");
-		break;
-	case UA_SECURECHANNELSTATE_OPN_SENT:
-		//UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Waiting for OPN Response");
-		break;
-	case UA_SECURECHANNELSTATE_OPEN:
-		//UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "A SecureChannel to the server is open");
 		break;
 	default:
 		break;
 	}
-
 	switch (sessionState) {
 	case UA_SESSIONSTATE_ACTIVATED: {
-		//UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "A session with the server is activated");
 		device->setAllBlue();
 		/* A new session was created. We need to create the subscription. */
 		/* Create a subscription */
 		for (const auto& item : signalMap) {
-
 			/* Add a MonitoredItem */
 			if (item.second.second) {
 				UA_CreateSubscriptionRequest request = UA_CreateSubscriptionRequest_default();
 				UA_CreateSubscriptionResponse response =
 					UA_Client_Subscriptions_create(client, request, NULL, NULL, deleteSubscriptionCallback);
-				if (response.responseHeader.serviceResult == UA_STATUSCODE_GOOD) {
-					//UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-					//    "Create subscription succeeded, id %u",
-					//    response.subscriptionId);
-				}
-				else
+				if (response.responseHeader.serviceResult != UA_STATUSCODE_GOOD)
 					return;
+
 				UA_NodeId currentNode =
 					UA_NODEID_STRING(1, _strdup(item.second.first.c_str()));
 
@@ -157,7 +139,6 @@ void OpcUaClient::initialRequest()
 	else {
 		m_threadState = -1;
 	}
-
 	/* Clean up */
 	/* Disconnects the client internally */
 	UA_Client_disconnect(m_client);

@@ -20,12 +20,10 @@ DWORD timeoutDevice = 30;
 
 SetupDevice::SetupDevice()
 {
-	//std::cout << "Create module Setup Device...\n";
 }
 
 SetupDevice::~SetupDevice()
 {
-	//std::cout << "Delete module Setup Device...\n";
 	isDeviceEnable = false;
 	buttonsMap.clear();
 }
@@ -116,7 +114,6 @@ void SetupDevice::installDevice()
 void SetupDevice::callbackSetLED(int indexButton, int indexState)
 {
 	DWORD result = 0;
-	//std::cout << "callback set led was used\n";
 	if (indexState == 1 && buttonsMap.count(indexButton) != 0) {
 		if (buttonsMap[indexButton].indexState == 0)
 			writeDeviceData(181, indexButton + 80, 1);
@@ -154,9 +151,7 @@ DWORD SetupDevice::HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 	char dataStr2[256];
 	int readlength = 0;
 	if (pData != nullptr) {
-		//std::cout << "pData != nullptr\n";
 		int d = _itoa_s(pData[1], dataStr2, 10);
-
 		int maxcols = 10;
 		int maxrows = 8;
 		for (int i = 0; i < maxcols; ++i) {
@@ -170,13 +165,9 @@ DWORD SetupDevice::HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 					callbackSetLED(keynum, 1);
 			}
 		}
-
 		for (int i = 0; i < readlength; ++i)
 			lastpData[i] = pData[i];  //save it for comparison on next read
 	}
-
-
-	//error handling
 	if (error == 307) {
 		CleanupInterface(hnd);
 		MessageBeep(MB_ICONHAND);
