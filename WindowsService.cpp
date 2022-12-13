@@ -15,9 +15,7 @@ CSampleService::CSampleService(PCWSTR pszServiceName,
 	setlocale(LC_ALL, "Russian");
 	m_bIsStopping = FALSE;
 	m_hHasStoppedEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-
-	if (m_hHasStoppedEvent == NULL)
-	{
+	if (m_hHasStoppedEvent == NULL) {
 		throw GetLastError();
 	}
 }
@@ -26,32 +24,25 @@ void CSampleService::OnStart(DWORD /* useleses */, PWSTR* /* useless */)
 {
 	const wchar_t* wsConfigFullPath = SERVICE_CONFIG_FILE;
 	bool bRunAsService = true;
-
 	// Log a service start message to the Application log.
 	WriteLogEntry(L"Astra.Keyboard запускается...", EVENTLOG_INFORMATION_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
-
-	if (m_argc > 1)
-	{
+	if (m_argc > 1) {
 		bRunAsService = (_wcsicmp(SERVICE_CMD, m_argv[1]) == 0);
 	}
-	else
-	{
+	else {
 		WriteLogEntry(L"Astra.Keyboard:\nNo run mode specified.", EVENTLOG_ERROR_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
 		throw exception("no run mode specified");
 	}
 
-	if (bRunAsService)
-	{
+	if (bRunAsService) {
 		// Add the main service function for execution in a worker thread.
 		if (!CreateThread(NULL, 0, ServiceRunner, this, 0, NULL))
-		{
 			WriteLogEntry(L"Astra.Keyboard не может создать рабочий поток.", EVENTLOG_ERROR_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
-		}
+
 	}
 	else
-	{
 		CSampleService::ServiceRunner(this);
-	}
+
 }
 
 CSampleService::~CSampleService()
@@ -70,17 +61,14 @@ DWORD __stdcall CSampleService::ServiceRunner(void* self)
 	pService->WriteLogEntry(L"Astra.Keyboard успешно запущена.", EVENTLOG_INFORMATION_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
 
 	// Periodically check if the service is stopping.
-	for (bool once = true; !pService->m_bIsStopping; once = false)
-	{
-		if (once)
-		{
+	for (bool once = true; !pService->m_bIsStopping; once = false) {
+		if (once) {
 			// Log multi-line message
 			pService->WriteLogEntry(L"Astra.Keyboard успешно работает.\n", EVENTLOG_INFORMATION_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
 			worker->initialRequest();
 		}
 		worker->stopSession();
-		switch (worker->getCurrentState())
-		{
+		switch (worker->getCurrentState()) {
 		case -1:
 			//std::cout << "Невозможно прочитать конфигурационный файл\n";
 			pService->WriteLogEntry(L"Невозможно прочитать конфигурационный файл", EVENTLOG_ERROR_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
@@ -102,7 +90,7 @@ DWORD __stdcall CSampleService::ServiceRunner(void* self)
 			pService->WriteLogEntry(L"Неизвестная ошибка", EVENTLOG_ERROR_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
 			break;
 		}
-	}	
+	}
 	// Signal the stopped event.
 	SetEvent(pService->m_hHasStoppedEvent);
 	pService->WriteLogEntry(L"Astra.Keyboard остановлена.", EVENTLOG_INFORMATION_TYPE, MSG_SHUTDOWN, CATEGORY_SERVICE);
@@ -114,13 +102,5 @@ void CSampleService::OnStop()
 {
 	// Log a service stop message to the Application log.
 	WriteLogEntry(L"Astra.Keyboard отключается...", EVENTLOG_INFORMATION_TYPE, MSG_SHUTDOWN, CATEGORY_SERVICE);
-	// Indicate that the service is stopping and wait for the finish of the
-	// main service function (ServiceWorkerThread).
-
 	m_bIsStopping = TRUE;
-	//exit(0);
-	//if (WaitForSingleObject(m_hHasStoppedEvent, INFINITE) != WAIT_OBJECT_0)
-	//{
-	//	throw GetLastError();
-	//}
 }

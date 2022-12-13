@@ -26,7 +26,6 @@ OpcUaClient::OpcUaClient()
 
 OpcUaClient::~OpcUaClient()
 {
-	//stopSession();
 }
 
 void OpcUaClient::handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* subContext, UA_UInt32 monId, void* monContext, UA_DataValue* value)
@@ -42,15 +41,11 @@ void OpcUaClient::handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* s
 
 		bool isEnable = subcribeMap[key].isSignalGood;
 		UA_Boolean error = *(UA_Boolean*)value->value.data;
-		//std::cout << "status code - " << status << std::endl;
-		if (error) {
-			//std::cout << "error - " << index << std::endl;
+		if (error)
 			device->setLED(index, 2, isEnable);
-		}
-		else {
-			//std::cout << "default - " << index << std::endl;
+		else
 			device->setLED(index, 1, isEnable);
-		}
+
 	}
 }
 
@@ -127,14 +122,12 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
 					subcribeMap[key].indexButton = value;
 					subcribeMap[key].isSignalGood = isEnable;
 					subcribeMap[key].node = currentNode;
-					//std::cout << "KEY - " << key << " index button - " << value << " isGoodSignal - " << isEnable << std::endl;
 				}
 			}
 		}
 	}
 								  break;
 	case UA_SESSIONSTATE_CLOSED:
-		//UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Session disconnected");
 		device->setAllRed();
 		break;
 	default:
@@ -158,9 +151,8 @@ void OpcUaClient::initialRequest()
 		/* Set stateCallback */
 		cc->stateCallback = stateCallback;
 		cc->subscriptionInactivityCallback = subscriptionInactivityCallback;
-		if (!infiniteRequest()) {
+		if (!infiniteRequest())
 			m_threadState = 2;
-		}
 	}
 	else {
 		m_threadState = -1;
@@ -222,7 +214,7 @@ bool OpcUaClient::infiniteRequest()
 			continue;
 		}
 		if (deviceIndicator && retval == UA_STATUSCODE_GOOD)
-			UA_Client_run_iterate(m_client, m_requestClientTime * 1000);		
+			UA_Client_run_iterate(m_client, m_requestClientTime * 1000);
 	}
 	m_threadState = 0;
 	return false;

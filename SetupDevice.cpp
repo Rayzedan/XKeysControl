@@ -32,31 +32,31 @@ SetupDevice::~SetupDevice()
 
 bool SetupDevice::getCurrentState()
 {
-	if (isDeviceEnable)
+	if (isDeviceEnable) {
 		return true;
+	}
 	else {		
-		Sleep(timeoutDevice * 1000);
 		installDevice();
+		Sleep(timeoutDevice * 1000);
 		return false;
 	}
 }
 
 void SetupDevice::writeDeviceData(int bufferKey, int indexButton, int indexState)
 {
-	//std::cout << "write device data\n";
-	DWORD result = 0;
-	int wlen = GetWriteLength(hnd);
-	for (int i = 0; i < wlen; ++i)
-	{
-		buffer[i] = 0;
-	}
-	buffer[1] = bufferKey;
-	buffer[2] = indexButton;
-	buffer[3] = indexState;
-	result = 404;
-	while (result == 404)
-	{
-		result = WriteData(hnd, buffer);
+	if (isDeviceEnable) {
+		DWORD result = 0;
+		int wlen = GetWriteLength(hnd);
+		for (int i = 0; i < wlen; ++i) {
+			buffer[i] = 0;
+		}
+		buffer[1] = bufferKey;
+		buffer[2] = indexButton;
+		buffer[3] = indexState;
+		result = 404;
+		while (result == 404) {
+			result = WriteData(hnd, buffer);
+		}
 	}
 }
 
@@ -68,18 +68,8 @@ void SetupDevice::installDevice()
 
 	DWORD result = 0;
 	result = EnumeratePIE(0x5F3, info, count);
-	if (result != 0)
-	{
+	if (result != 0) {
 		isDeviceEnable = false;
-		if (result == 102) {
-			//std::cout << "No PI Engineering Devices Found\n";
-		}
-		else {
-			//std::cout << "Error finding PI Engineering Devices\n";
-		}
-	}
-	else if (count == 0) {
-		//std::cout << "No device found...\n";
 	}
 	else {
 		//std::cout << "Found device...\n";
@@ -89,11 +79,9 @@ void SetupDevice::installDevice()
 			int hidusagepage = info[i].UP; //hid usage page
 			int version = info[i].Version;
 			int writelen = GetWriteLength(info[i].Handle);
-			if ((hidusagepage == 0xC && writelen == 36))
-			{
+			if ((hidusagepage == 0xC && writelen == 36)) {
 				hnd = info[i].Handle; //handle required for piehid.dll calls
 				result = SetupInterfaceEx(hnd);
-				//std::cout << "Find new PI Engineering Device\n";
 			}
 		}
 		//Turn on the data callback	
@@ -107,16 +95,14 @@ void SetupDevice::installDevice()
 		}
 
 		int wlen = GetWriteLength(hnd);
-		for (int i = 0; i < wlen; ++i)
-		{
+		for (int i = 0; i < wlen; ++i) {
 			buffer[i] = 0;
 		}
 		writeDeviceData(179, 6, 1);
 		writeDeviceData(182, 0, 255);
 		writeDeviceData(182, 1, 0);
 		if (buttonsMap.size() > 0) {
-			for (auto const& item : buttonsMap)
-			{
+			for (auto const& item : buttonsMap) {
 				if (!item.second.isEnable) {
 					writeDeviceData(181, item.first, 0);
 					writeDeviceData(181, item.first + 80, 1);
@@ -132,7 +118,7 @@ void SetupDevice::installDevice()
 			}
 		}
 	}
-	
+
 }
 
 void SetupDevice::callbackSetLED(int indexButton, int indexState)
@@ -140,9 +126,8 @@ void SetupDevice::callbackSetLED(int indexButton, int indexState)
 	DWORD result = 0;
 	//std::cout << "callback set led was used\n";
 	if (indexState == 1 && buttonsMap.count(indexButton) != 0) {
-		if (buttonsMap[indexButton].indexState == 0) {
+		if (buttonsMap[indexButton].indexState == 0)
 			writeDeviceData(181, indexButton + 80, 1);
-		}
 	}
 }
 
@@ -182,35 +167,27 @@ DWORD SetupDevice::HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 
 		int maxcols = 10;
 		int maxrows = 8;
-		for (int i = 0; i < maxcols; ++i) //loop for each column of button data (Max Cols)
-		{
-			for (int j = 0; j < maxrows; ++j) //loop for each row of button data (Max Rows)
-			{
+		for (int i = 0; i < maxcols; ++i) {
+			for (int j = 0; j < maxrows; ++j) {
 				int temp1 = pow(2, j);
 				int keynum = maxrows * i + j; //0 based index
-
 				int state = 0; //0=was up and is up, 1=was up and is down, 2= was down and is down, 3=was down and is up 
 				if (((pData[i + 3] & temp1) != 0) && ((lastpData[i + 3] & temp1) == 0))
 					state = 1;
-
 				if (state == 1)
 					callbackSetLED(keynum, 1);
 			}
 		}
 
 		for (int i = 0; i < readlength; ++i)
-		{
 			lastpData[i] = pData[i];  //save it for comparison on next read
-		}
 	}
 
 
 	//error handling
-	if (error == 307)
-	{
+	if (error == 307) {
 		CleanupInterface(hnd);
 		MessageBeep(MB_ICONHAND);
-		//std::cout << "Device disconnected\n";
 		isDeviceEnable = false;
 	}
 	return TRUE;
@@ -219,7 +196,7 @@ DWORD SetupDevice::HandleDataEvent(UCHAR* pData, DWORD deviceID, DWORD error)
 DWORD SetupDevice::HandleErrorEvent(DWORD deviceID, DWORD status)
 {
 	MessageBeep(MB_ICONHAND);
-	//std::cout << "Error from error callback\n";
+	isDeviceEnable = false;
 	return TRUE;
 }
 
