@@ -35,7 +35,7 @@ bool SetupDevice::getCurrentState()
 	if (isDeviceEnable) {
 		return true;
 	}
-	else {		
+	else {
 		installDevice();
 		Sleep(timeoutDevice * 1000);
 		return false;
@@ -47,16 +47,14 @@ void SetupDevice::writeDeviceData(int bufferKey, int indexButton, int indexState
 	if (isDeviceEnable) {
 		DWORD result = 0;
 		int wlen = GetWriteLength(hnd);
-		for (int i = 0; i < wlen; ++i) {
+		for (int i = 0; i < wlen; ++i)
 			buffer[i] = 0;
-		}
 		buffer[1] = bufferKey;
 		buffer[2] = indexButton;
 		buffer[3] = indexState;
 		result = 404;
-		while (result == 404) {
+		while (result == 404)
 			result = WriteData(hnd, buffer);
-		}
 	}
 }
 
@@ -89,15 +87,9 @@ void SetupDevice::installDevice()
 		result = SetErrorCallback(hnd, HandleErrorEvent);
 		SuppressDuplicateReports(hnd, true);
 		DisableDataCallback(hnd, false); //turn on callback in the case it was turned off by some other command
-		if (result != 0) {
-			GetErrorString(result, errordescription, 100);
-			//std::cout << "error description - " << errordescription << std::endl;
-		}
-
 		int wlen = GetWriteLength(hnd);
-		for (int i = 0; i < wlen; ++i) {
+		for (int i = 0; i < wlen; ++i)
 			buffer[i] = 0;
-		}
 		writeDeviceData(179, 6, 1);
 		writeDeviceData(182, 0, 255);
 		writeDeviceData(182, 1, 0);

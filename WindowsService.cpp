@@ -15,9 +15,8 @@ CSampleService::CSampleService(PCWSTR pszServiceName,
 	setlocale(LC_ALL, "Russian");
 	m_bIsStopping = FALSE;
 	m_hHasStoppedEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-	if (m_hHasStoppedEvent == NULL) {
+	if (m_hHasStoppedEvent == NULL)
 		throw GetLastError();
-	}
 }
 
 void CSampleService::OnStart(DWORD /* useleses */, PWSTR* /* useless */)
@@ -70,23 +69,18 @@ DWORD __stdcall CSampleService::ServiceRunner(void* self)
 		worker->stopSession();
 		switch (worker->getCurrentState()) {
 		case -1:
-			//std::cout << "Невозможно прочитать конфигурационный файл\n";
 			pService->WriteLogEntry(L"Невозможно прочитать конфигурационный файл", EVENTLOG_ERROR_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
 			break;
 		case 0:
-			//std::cout << "Служба работает в штатном режиме\n";
 			pService->WriteLogEntry(L"Служба работает в штатном режиме", EVENTLOG_INFORMATION_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
 			break;
 		case 1:
-			//std::cout << "Модуль клиента не отвечает\n";
 			pService->WriteLogEntry(L"Модуль OPC-клиента отключён", EVENTLOG_ERROR_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
 			break;
 		case 2:
-			//std::cout << "Модуль клиента не отвечает\n";
 			pService->WriteLogEntry(L"Передача данных прервана", EVENTLOG_ERROR_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
 			break;
 		default:
-			//std::cout << "Неизвестная ошибка\n";
 			pService->WriteLogEntry(L"Неизвестная ошибка", EVENTLOG_ERROR_TYPE, MSG_OPERATION, CATEGORY_SERVICE);
 			break;
 		}
