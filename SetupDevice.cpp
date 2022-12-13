@@ -11,10 +11,10 @@ struct buttonData
 
 BYTE buffer[80];
 BYTE lastpData[80];
-long hnd;
+long hnd = 0;
 long count = 0;
 int pid = 0;
-std::map<int, buttonData>buttonsMap;
+std::map<int, buttonData>buttonsMap{};
 bool isDeviceEnable = false;
 DWORD timeoutDevice = 30;
 
@@ -59,7 +59,6 @@ void SetupDevice::writeDeviceData(int bufferKey, int indexButton, int indexState
 void SetupDevice::installDevice()
 {
 	TEnumHIDInfo info[128];
-	char errordescription[100];
 	//std::cout << "Setup device...\n";
 
 	DWORD result = 0;

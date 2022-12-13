@@ -11,9 +11,9 @@ struct signalNode
 	UA_NodeId node;
 	bool isSignalGood;
 };
-std::map<int, std::pair<std::string, int>> signalMap;
-std::map<int, signalNode> subcribeMap;
-std::vector<std::string> config;
+std::map<int, std::pair<std::string, int>> signalMap{};
+std::map<int, signalNode> subcribeMap{};
+std::vector<std::string> config{};
 DWORD timeout = 30;
 SetupDevice* device = new SetupDevice();
 
@@ -126,6 +126,7 @@ void OpcUaClient::initialRequest()
 		m_file->getConfigList(config);
 		timeout = atoi(config[2].c_str());
 		device->setTimeoutDevice(timeout);
+		device->installDevice();
 		m_requestClientTime = atoi(config[1].c_str());
 		m_client = UA_Client_new();
 		UA_ClientConfig* cc = UA_Client_getConfig(m_client);

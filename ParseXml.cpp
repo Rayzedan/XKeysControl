@@ -47,7 +47,7 @@ int ParseXml::getConfigFile()
 			std::replace(++iter, path.end(), '/', '\\');
 	}
 	std::cout << "path - " << path << std::endl;
-	pugi::xml_document doc;
+	pugi::xml_document doc{};
 	pugi::xml_parse_result result = doc.load_file(path.c_str());
 	if (result) {
 		std::cout << "not null\n";
@@ -55,7 +55,7 @@ int ParseXml::getConfigFile()
 		for (pugi::xml_node tool = tools.first_child(); tool; tool = tool.next_sibling()) {
 			int key = 0;
 			int enableOpc = 0;
-			std::string signalPath;
+			std::string signalPath{};
 			for (pugi::xml_attribute attr = tool.first_attribute(); attr; attr = attr.next_attribute()) {
 				std::string name = attr.name();
 				if (name == "EnableOPC")
@@ -65,6 +65,8 @@ int ParseXml::getConfigFile()
 				else if (name == "Number")
 					key = convertIndexButton(atoi(attr.value()));
 			}
+			if (signalPath == "")
+				enableOpc = 0;
 			m_signals[key].first = signalPath;
 			m_signals[key].second = enableOpc;
 		}
