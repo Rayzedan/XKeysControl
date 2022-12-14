@@ -3,8 +3,9 @@
 #include "event_ids.h"
 #include <iostream>
 #include "OpcUaClient.h"
+#include <memory>
 
-OpcUaClient* worker = new OpcUaClient();
+std::unique_ptr<OpcUaClient> worker = std::make_unique<OpcUaClient>();
 
 CSampleService::CSampleService(PCWSTR pszServiceName,
 	BOOL fCanStop,
@@ -37,7 +38,6 @@ void CSampleService::OnStart(DWORD /* useleses */, PWSTR* /* useless */)
 		// Add the main service function for execution in a worker thread.
 		if (!CreateThread(NULL, 0, ServiceRunner, this, 0, NULL))
 			WriteLogEntry(L"Astra.Keyboard не может создать рабочий поток.", EVENTLOG_ERROR_TYPE, MSG_STARTUP, CATEGORY_SERVICE);
-
 	}
 	else
 		CSampleService::ServiceRunner(this);

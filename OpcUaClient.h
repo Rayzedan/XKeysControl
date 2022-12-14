@@ -7,6 +7,7 @@
 #include <open62541/plugin/log_stdout.h>
 #include "ParseXml.h"
 #include <stdlib.h>
+#include <memory>
 #pragma comment(lib, "Ws2_32.lib")
 
 class OpcUaClient
@@ -22,7 +23,7 @@ private:
 	bool infiniteRequest();
 	int m_requestClientTime = 5;
 	int m_threadState;
-	ParseXml* m_file;
+	std::unique_ptr<ParseXml> m_file;	
 	UA_Client* m_client;
 	static void handlerNodeChanged(UA_Client* client, UA_UInt32 subId, void* subContext,
 		UA_UInt32 monId, void* monContext, 

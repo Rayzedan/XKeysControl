@@ -15,8 +15,7 @@ std::map<int, std::pair<std::string, int>> signalMap{};
 std::map<int, signalNode> subcribeMap{};
 std::vector<std::string> config{};
 DWORD timeout = 30;
-SetupDevice* device = new SetupDevice();
-
+std::unique_ptr<SetupDevice> device = std::make_unique<SetupDevice>();
 
 
 OpcUaClient::OpcUaClient()
@@ -119,7 +118,7 @@ void OpcUaClient::stateCallback(UA_Client* client, UA_SecureChannelState channel
 
 void OpcUaClient::initialRequest()
 {
-	m_file = new ParseXml();
+	m_file = std::make_unique<ParseXml>();
 	if (m_file->getConfigFile() != -1) {
 		running = true;
 		m_file->getSignalMap(signalMap);
@@ -161,10 +160,6 @@ void OpcUaClient::stopSession()
 	device->setAllRed();
 	if (m_client != nullptr)
 		UA_Client_delete(m_client);
-	if (device != nullptr)
-		delete device;
-	if (m_file != nullptr)
-		delete m_file;
 }
 
 bool OpcUaClient::infiniteRequest()
