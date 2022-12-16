@@ -15,6 +15,8 @@ class OpcUaClient
 public:
 	OpcUaClient();
 	virtual ~OpcUaClient();
+	OpcUaClient(const OpcUaClient& copy) = delete;
+	OpcUaClient& operator=(const OpcUaClient& client) = delete;
 	int getCurrentState();
 	void initialRequest();
 	void stopSession();

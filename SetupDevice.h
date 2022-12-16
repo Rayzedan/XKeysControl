@@ -6,6 +6,8 @@ class SetupDevice
 public:
 	SetupDevice();
 	virtual ~SetupDevice();
+	SetupDevice(const SetupDevice& copy) = delete;
+	SetupDevice& operator=(const SetupDevice& client) = delete;
     void setLED(int indexButton, int indexState, bool isStatusGood);
 	void setAllRed();
 	void setAllBlue();

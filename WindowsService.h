@@ -44,13 +44,11 @@ class CSampleService: public CServiceBase
                    BOOL fCanPauseContinue = FALSE
                   );
     virtual ~CSampleService();
-
+    CSampleService(const CSampleService& copy) = delete;
+    CSampleService& operator=(const CSampleService& client) = delete;
     virtual void OnStart(DWORD dwArgc, PWSTR *pszArgv);
-
     virtual void OnStop();
-
     static DWORD __stdcall ServiceRunner(void* self);
-
     void Run();
   private:
     BOOL m_bIsStopping;
